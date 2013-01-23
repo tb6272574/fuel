@@ -1,0 +1,52 @@
+# Create your views here.
+from django.template import Context, loader, RequestContext
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.contrib import auth
+from fuel.models import FuelUser, Profile, Record
+from django.core.urlresolvers import reverse
+
+def index(request):
+    if request.user.is_anonymous():
+        return HttpResponseRedirect(reverse('login'))
+    else:
+        return HttpResponseRedirect(reverse('home'))
+
+# requires not logged in
+def login(request):
+
+    if not request.user.is_anonymous():
+        return HttpResponseRedirect(reverse('home'))
+
+    if request.method == 'GET':
+        return render_index(request)
+
+    elif 'email' in request.POST and 'password' in request.POST:
+       
+        user = auth.authenticate(username=request.POST['email'], password=request.POST['password'])
+
+        if user is not None and user.is_active:
+            auth.login(request, user)
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            return render_index(request, login_fail=True)
+    
+    else:
+        return render_index(request, login_fail=True)
+
+
+def render_index(request, login_fail=False):
+    t = loader.get_template('index.html')
+    c = RequestContext(request, {'login_fail': login_fail})
+    if 'email' in request.POST:
+        c.update({'email': request.POST['email']})
+    return HttpResponse(t.render(c))
+
+# requires logged in
+def home(request):
+    return HttpResponse('<a href="/logout/">logout</a>')
+
+# requires logged in; logs out
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect(reverse('login'))
+    
