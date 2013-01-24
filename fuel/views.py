@@ -43,7 +43,14 @@ def render_index(request, login_fail=False):
 
 # requires logged in
 def home(request):
-    return HttpResponse('<a href="/logout/">logout</a>')
+    t = loader.get_template('home.html')
+    c = RequestContext(request, {'username': request.user.get_full_name()})
+    return HttpResponse(t.render(c))  
+    #return HttpResponse('%s <a href="/logout/">logout</a>'%request.user.get_full_name())
+
+# add record for a user
+def addrecord(request):
+   return HttpResponse("aa")
 
 # requires logged in; logs out
 def logout(request):
