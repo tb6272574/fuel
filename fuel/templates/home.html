@@ -1,0 +1,64 @@
+{% extends 'frame.html' %}
+{% block title %}home{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        <div>
+            <h3>Your Current Status</h3>
+            {% if user.status == 'g' %}
+              <span class="badge badge-warning">Gold</span>
+            {% else %}
+              {% if user.status == 's' %}
+              <span class="badge badge-default">Silver</span>
+              {% else %}
+                <span class="badge badge-important">Bronze</span>
+              {% endif %}
+            {% endif %}
+
+            <p>
+              <h3>List of Activities</h3>
+            </p>
+           <table class="table table-cordered table-striped" text-align="center">
+            <thead>
+	    <tr> 
+              <th>Date</th>
+              <th>Action</th>
+              <th>Steps</th>
+	      <th>Calories</th>
+	      <th>Fuel Score</th>
+	      <th>OIT 258 currency</th>
+            </tr>
+	    </thead>
+	    <tbody>
+            {% for record in user.record_set.all %}
+	     <tr>
+	      <td>{{ record.date }}</td>
+	      <td>{{ record.amount.action }}</td>
+              <td>{{ record.steps }}</td>
+              <td>{{ record.calories }}</td>
+              <td> {{ record.fuelscore }}</td>
+              <td>{{ record.amount.amount }}</td>
+             </tr>
+	    {% endfor %}
+            </tbody>
+           </table>
+	   </ul>
+        </div>
+    </div>
+     <div class="span12">
+      <div class="well">
+      <form class="form-inline" style="margin-bottom: 0" method="post" action="{% url addrecord %}">
+      <h3> Input your activity today </h3>
+      {% csrf_token%}
+      <input class="input span2" type="text" name="step" placeholder="#steps (e.g. 1000)" value="{{ step }}">
+      <input class="input span2" type="text" name="calories" placeholder="#calorie (e.g. 500)" value="{{ calorie }}">
+      <input class="input span2" type="text" name="fuel_score" placeholder="fuel score (e.g. 2000)" value="{{ fuel_score }}">
+      <input class="input span3" type="text" name="note" placeholder="Note (e.g. Running at Gym)" value="{{ note }}">
+      <input class="input span2" type="date" name="date" placeholder="datee" value="{{ date }}">
+      <button type="submit span2" class="btn btn-success btn-primary" style="float:right">Submit</button>
+      </form>
+      </div>
+     </div>
+     </h4>
+    </div>
+{% endblock %}}
