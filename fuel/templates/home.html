@@ -3,12 +3,13 @@
 {% block content %}
 
 <script type="text/javascript">
+  var csrf_token = "{{ csrf }}";
   $(document).ready(function() {
 
      $("#submit-button").click(function(){
 	$.get("/addrecord/", {       
           "step": $("#step").val(), "calories": $("#calories").val(), "fuel_score": $("#fuel_score").val(),
-          "note": $("#note").val(), "date": $("date").val(), });
+          "note": $("#note").val(), "date": $("date").val(), "csrfmiddlewaretoken": csrf_token});
 	location.reload();
      });
   });

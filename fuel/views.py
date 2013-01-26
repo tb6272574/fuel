@@ -35,8 +35,11 @@ def login(request):
 
 #add record
 def addrecord(request):
-    t = Record();
-    t.user=request.user;
+    print 'aaaa'
+    t = Record(user=request.user)
+    print 'bbbb'
+    t.save()
+    print 'cccc'
     #print request.GET['date'];
     #t.date = request.GET['date'];
     t.steps = request.GET['step']
