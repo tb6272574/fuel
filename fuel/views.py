@@ -37,16 +37,14 @@ def login(request):
 def addrecord(request):
     print 'aaaa'
     t = Record(user=request.user)
-    print 'bbbb'
-    t.save()
-    print 'cccc'
-    #print request.GET['date'];
     #t.date = request.GET['date'];
     t.steps = request.GET['step']
     t.calories = request.GET['calories']
     t.fuelscore = request.GET['fuel_score']
-    print 'aaaaa'
-    #t.save_amount();
+    print 'bbbb'
+    t.save_amount();
+    print 'cccc'
+    t.amount
     t.save()
     print 'dddd'
     #request.user.get_profile().save();

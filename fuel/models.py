@@ -56,6 +56,8 @@ class Amount(models.Model):
     amount = models.IntegerField('Amount', default=0)
     atype = models.IntegerField('Type', choices=TYPES, default=0)
     action = models.CharField('Action', max_length=100)
+    def __unicode__(self):
+        return u"%d" % (self.amount)
 
 class Profile(models.Model):
     user = models.OneToOneField(User)
