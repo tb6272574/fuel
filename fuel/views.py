@@ -11,6 +11,13 @@ def index(request):
     else:
         return HttpResponseRedirect(reverse('home'))
 
+def render_index(request, login_fail=False):
+    t = loader.get_template('index.html')
+    c = RequestContext(request, {'login_fail': login_fail})
+    if 'email' in request.POST:
+        c.update({'email': request.POST['email']})
+    return HttpResponse(t.render(c))
+
 # requires not logged in
 def login(request):
 

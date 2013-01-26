@@ -12,6 +12,8 @@
           "note": $("#note").val(), "date": $("date").val(), "csrfmiddlewaretoken": csrf_token});
 	location.reload();
      });
+
+    $("#date").val(new Date().toJSON().substring(0,10));
   });
 </script>
 
@@ -83,7 +85,7 @@
       <h4> Put down your bet here </h4>
       {% csrf_token%}
       <input class="input span4" type="text" id="stake" name="stake" placeholder="stake (e.g. 1000)" value="{{ stake }}">
-      <button id="bet-button" name="bet-button" type="submit span2" class="btn btn-success btn-primary" style="float:right">Bet!</button>
+      <button id="bet-button" name="bet-button" type="submit span2" class="btn btn-info btn-primary" style="float:right">Bet!</button>
       
       </form>
       </div>
