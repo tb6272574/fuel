@@ -33,13 +33,18 @@ def login(request):
     else:
         return render_index(request, login_fail=True)
 
-
-def render_index(request, login_fail=False):
-    t = loader.get_template('index.html')
-    c = RequestContext(request, {'login_fail': login_fail})
-    if 'email' in request.POST:
-        c.update({'email': request.POST['email']})
-    return HttpResponse(t.render(c))
+#add record
+def addrecord(request):
+    print 'fdsafdsafdsafdsafdsafdsafdsa'
+    t = Record(user=request.user);
+    print request.GET['date'];
+    t.date = request.GET['date'];
+    t.steps = request.GET['step'];
+    t.calories = request.GET['calories'];
+    t.fuelscore = request.GET['fuel_score'];
+    t.save_amount();
+    t.save()
+    #request.user.get_profile().save();
 
 # requires logged in
 def home(request):
@@ -50,6 +55,7 @@ def home(request):
 
 # add record for a user
 def addrecord(request):
+
    return HttpResponse("aa")
 
 # requires logged in; logs out

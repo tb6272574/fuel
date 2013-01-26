@@ -1,6 +1,19 @@
 {% extends 'frame.html' %}
 {% block title %}home{% endblock %}
 {% block content %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+
+     $("#submit-button").click(function(){
+	$.get("/addrecord/", {       
+          "step": $("#step").val(), "calories": $("#calories").val(), "fuel_score": $("#fuel_score").val(),
+          "note": $("#note").val(), "date": $("date").val(), });
+	location.reload();
+     });
+  });
+</script>
+
 <div class="row">
     <div class="span12">
         <div>
@@ -47,15 +60,15 @@
     </div>
      <div class="span12">
       <div class="well">
-      <form class="form-inline" style="margin-bottom: 0" method="post" action="{% url addrecord %}">
+      <form class="form-inline" style="margin-bottom: 0" method="post">
       <h3> Input your activity today </h3>
       {% csrf_token%}
-      <input class="input span2" type="text" name="step" placeholder="#steps (e.g. 1000)" value="{{ step }}">
-      <input class="input span2" type="text" name="calories" placeholder="#calorie (e.g. 500)" value="{{ calorie }}">
-      <input class="input span2" type="text" name="fuel_score" placeholder="fuel score (e.g. 2000)" value="{{ fuel_score }}">
-      <input class="input span3" type="text" name="note" placeholder="Note (e.g. Running at Gym)" value="{{ note }}">
-      <input class="input span2" type="date" name="date" placeholder="datee" value="{{ date }}">
-      <button type="submit span2" class="btn btn-success btn-primary" style="float:right">Submit</button>
+      <input class="input span2" type="text" id="step" name="step" placeholder="#steps (e.g. 1000)" value="{{ step }}">
+      <input class="input span2" type="text" id="calories" name="calories" placeholder="#calorie (e.g. 500)" value="{{ calorie }}">
+      <input class="input span2" type="text" id="fuel_score" name="fuel_score" placeholder="fuel score (e.g. 2000)" value="{{ fuel_score }}">
+      <input class="input span3" type="text" id="note" name="note" placeholder="Note (e.g. Running at Gym)" value="{{ note }}">
+      <input class="input span2" type="date" id="date" name="date" placeholder="datee" value="{{ date }}">
+      <button id="submit-button" name="submit-button" type="submit span2" class="btn btn-success btn-primary" style="float:right">Submit</button>
       </form>
       </div>
      </div>
