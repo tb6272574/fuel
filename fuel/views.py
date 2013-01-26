@@ -35,15 +35,17 @@ def login(request):
 
 #add record
 def addrecord(request):
-    print 'fdsafdsafdsafdsafdsafdsafdsa'
-    t = Record(user=request.user);
-    print request.GET['date'];
-    t.date = request.GET['date'];
-    t.steps = request.GET['step'];
-    t.calories = request.GET['calories'];
-    t.fuelscore = request.GET['fuel_score'];
-    t.save_amount();
+    t = Record();
+    t.user=request.user;
+    #print request.GET['date'];
+    #t.date = request.GET['date'];
+    t.steps = request.GET['step']
+    t.calories = request.GET['calories']
+    t.fuelscore = request.GET['fuel_score']
+    print 'aaaaa'
+    #t.save_amount();
     t.save()
+    print 'dddd'
     #request.user.get_profile().save();
 
 # requires logged in
@@ -52,11 +54,6 @@ def home(request):
     c = RequestContext(request, {'username': request.user.get_full_name()})
     return HttpResponse(t.render(c))  
     #return HttpResponse('%s <a href="/logout/">logout</a>'%request.user.get_full_name())
-
-# add record for a user
-def addrecord(request):
-
-   return HttpResponse("aa")
 
 # requires logged in; logs out
 def logout(request):

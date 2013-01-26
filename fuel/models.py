@@ -106,7 +106,7 @@ class Record(models.Model):
         a.user = self.user
         a.amount = get_amount()
         a.atype = 1
-        a.action = 'FuelScore for %s' % date.strftime('%m/%d/%y')
+        #a.action = 'FuelScore for %s' % date.strftime('%m/%d/%y')
         a.save()
         self.amount = a
         self.save()
