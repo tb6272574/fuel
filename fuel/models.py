@@ -103,17 +103,18 @@ class Record(models.Model):
     amount = models.OneToOneField(Amount)
     last_updated = models.DateTimeField('Last updated', default='', auto_now=True)
 
+    def get_amount(self):
+        return self.fuelscore
+
     def save_amount(self):
         a = Amount()
         a.user = self.user
-        a.amount = get_amount()
+        a.amount = self.get_amount()
         a.atype = 1
         #a.action = 'FuelScore for %s' % date.strftime('%m/%d/%y')
         a.save()
         self.amount = a
         self.save()
 
-    def get_amount(self):
-        return self.fuelscore
 
 

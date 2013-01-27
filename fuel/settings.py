@@ -150,3 +150,5 @@ LOGGING = {
         },
     }
 }
+
+WEBSITE_NAME = 'GSBurnCals'

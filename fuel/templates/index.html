@@ -4,8 +4,8 @@
 <div class="row">
     <div class="span6">
         <div class="well">
-            <h2>Welcome to GSBurn!</h2>
-            <p>GSBurn allows you to upload your own FuelBand data and compete in an incentive program against your OIT258 classmates.</p>
+            <h2>Welcome to {{ website_name }}!</h2>
+            <p>{{ website_name }} allows you to upload your own Nike+ FuelBand data and compete in an incentive program against your OIT258 classmates.</p>
         </div>
         <div class="container-fluid" style="padding:0">
             <div class="row-fluid">
@@ -24,7 +24,7 @@
     <div class="span6">
         <div class="well">
         <form class="form-inline" style="margin-bottom: 0" method="post" action="{% url login %}">
-            <h3>Log in to GSBurn</h3>
+            <h3>Log in to {{ website_name }}</h3>
             {% csrf_token %}
             <input class="input span2" type="text" name="email" placeholder="@stanford.edu" value="{{ email }}">
             <input class="input span2" type="password" name="password" placeholder="password">
