@@ -8,10 +8,10 @@ DAILY_BONUS = 100
 
 TYPES = (
         (0, 'reserved'),
-        (1, 'trip'),
+        (1, 'activity'),
         (2, 'daily bonus'),
-        (3, 'play game'),
-        (4, 'manual'),
+        (3, 'bet'),
+        (4, 'gamble return'),
         )
 
 # Create your models here.

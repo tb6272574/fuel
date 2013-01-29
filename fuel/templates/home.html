@@ -3,15 +3,44 @@
 {% block content %}
 
 <script type="text/javascript">
-  var csrf_token = "{{ csrf }}";
   $(document).ready(function() {
-
      $("#submit-button").click(function(){
-	$.get("/addrecord/", {       
+        var intRegex = /^\d+$/;
+
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        var inputdate = $("#date").val().split("-");
+        if ((!intRegex.test(inputdate[0])) || (!intRegex.test(inputdate[1])) || (!intRegex.test(inputdate[2])))
+        {
+          alert('Please input correct date');
+          return false;
+        }
+        else {
+          var d=parseInt(inputdate[2]);
+          var m=parseInt(inputdate[1]);
+          var y=parseInt(inputdate[0]);
+          if ((y!=2013)||(m>mm)||((m==mm)&&(d>=dd)))
+          {
+            alert('Please only input data PRIOR to today');
+            return false;
+          }
+        }
+        if(!intRegex.test($("#step").val()))
+          alert("Step should be a non-negative integer");
+        else if(!intRegex.test($("#calories").val())) 
+          alert("Calories should be a non-negative integer")
+        else if(!intRegex.test($("#fuel_score").val()))
+          alert("Fuel score should be a non-negative integer")
+        else   
+	  $.get("/addrecord/", {       
           "step": $("#step").val(), "calories": $("#calories").val(), "fuel_score": $("#fuel_score").val(),
-          "note": $("#note").val(), "date": $("date").val(), "csrfmiddlewaretoken": csrf_token});
-	location.reload();
-     });
+          "note": $("#note").val(), "date": $("#date").val()}).done(function(){
+             location.reload(true); 
+          });
+        return false;
+      });
 
     $("#date").val(new Date().toJSON().substring(0,10));
   });
@@ -21,10 +50,10 @@
     <div class="span12">
         <div>
             <h3>Your Current Status</h3>
-            {% if user.status == 'g' %}
+            {% if user.profile.status == 'g' %}
               <span class="badge badge-warning">Gold</span>
             {% else %}
-              {% if user.status == 's' %}
+              {% if user.profile.status == 's' %}
               <span class="badge badge-default">Silver</span>
               {% else %}
                 <span class="badge badge-important">Bronze</span>
@@ -63,16 +92,13 @@
     </div>
      <div class="span12">
       <div class="well">
-      <form class="form-inline" style="margin-bottom: 0" method="post">
       <h3> Input your activity today </h3>
-      {% csrf_token%}
       <input class="input span2" type="text" id="step" name="step" placeholder="#steps (e.g. 1000)" value="{{ step }}">
       <input class="input span2" type="text" id="calories" name="calories" placeholder="#calorie (e.g. 500)" value="{{ calorie }}">
       <input class="input span2" type="text" id="fuel_score" name="fuel_score" placeholder="fuel score (e.g. 2000)" value="{{ fuel_score }}">
       <input class="input span3" type="text" id="note" name="note" placeholder="Note (e.g. Running at Gym)" value="{{ note }}">
-      <input class="input span2" type="date" id="date" name="date" placeholder="datee" value="{{ date }}">
+      <input class="input span2" type="date" id="date" name="date" placeholder="date" value="{{ date }}">
       <button id="submit-button" name="submit-button" type="submit span2" class="btn btn-success btn-primary" style="float:right">Submit</button>
-      </form>
       </div>
      </div>
      <div class "span12">
