@@ -2,9 +2,10 @@
 from django.template import Context, loader, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.contrib import auth
-from fuel.models import FuelUser, Profile, Record
+from fuel.models import FuelUser, Profile, Record, Amount
 from fuel.settings import WEBSITE_NAME
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 import datetime
 
 def index(request):
@@ -34,6 +35,7 @@ def login(request):
         user = auth.authenticate(username=request.POST['email'], password=request.POST['password'])
 
         if user is not None and user.is_active:
+            #addloginbonus(request)
             auth.login(request, user)
             return HttpResponseRedirect(reverse('home'))
         else:
@@ -42,10 +44,21 @@ def login(request):
     else:
         return render_index(request, login_fail=True)
 
+def addloginbonus(request):
+    #try:
+        #t=Amount.objects.filter(date=datetime.datetime.now()).filter(atype=2).get(user=request.user)
+    #    t=Amount.objects.get(user=request.user)
+    #except ObjectDoesNotExist:
+    #    Profile(user=request.user).add_daily_bonus()
+
+    #t=Profile(user=request.user);
+    #t.add_daily_bonus()
+    print 'nothing'
+
 #add record
 def addrecord(request):
     #print request.GET['calories']
-    t = loader.get_template('home.html')
+    #t = loader.get_template('home.html')
     #if (not request.GET['step'].isdigit()):
     #    print 'bad step'
     #    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'submit_fail': True, 'submit_fail_msg': 'Step should be a non-negative integer'})
@@ -60,9 +73,14 @@ def addrecord(request):
     #if ((not year.isdigit()) or (not month.isdigit()) or (not day.isdigit())):
     #    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'submit_fail': True, 'submit_fail_msg': 'Date format not right'})
     #    return HttpResponse(t.render(c))
+    try:
+        t=Record.objects.filter(date=datetime.date(int(year),int(month),int(day))).get(user=request.user)
+        t.amount.delete()
+        t.delete()
+    except ObjectDoesNotExist:
+        print 'No clash'
     t = Record(user=request.user)
     t.date = datetime.date(int(year), int(month), int(day))
-    Record.objects.filter(date=t.date).filter(user=request.user).delete()
     # the following three all need to be ints not strings
     t.steps = int(request.GET['step'])
     t.calories = int(request.GET['calories'])

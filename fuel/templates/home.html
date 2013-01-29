@@ -67,7 +67,7 @@
             <thead>
 	    <tr> 
               <th>Date</th>
-              <th>Action</th>
+              <th>Type</th>
               <th>Steps</th>
 	      <th>Calories</th>
 	      <th>Fuel Score</th>
@@ -75,14 +75,20 @@
             </tr>
 	    </thead>
 	    <tbody>
-            {% for record in user.record_set.all %}
+            {% for amount in user.amount_set.all %}
 	     <tr>
-	      <td>{{ record.date }}</td>
-	      <td>{{ record.amount.action }}</td>
-              <td>{{ record.steps }}</td>
-              <td>{{ record.calories }}</td>
-              <td> {{ record.fuelscore }}</td>
-              <td>{{ record.amount.amount }}</td>
+	      <td>{{ amount.record.date }}</td>
+	      <td>{{ amount.get_atype_display }}</td>
+              {% if amount.atype == 1 %}
+                 <td>{{ amount.record.steps }}</td>
+                 <td>{{ amountrecord.calories }}</td>
+                 <td> {{ amount.record.fuelscore }}</td>
+              {% else %}
+                 <td></td>
+                 <td></td>
+                 <td></td>
+              {% endif %}
+              <td>{{ amount }}</td>
              </tr>
 	    {% endfor %}
             </tbody>

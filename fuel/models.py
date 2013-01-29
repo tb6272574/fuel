@@ -8,10 +8,10 @@ DAILY_BONUS = 100
 
 TYPES = (
         (0, 'reserved'),
-        (1, 'activity'),
-        (2, 'daily bonus'),
-        (3, 'bet'),
-        (4, 'gamble return'),
+        (1, 'Activity'),
+        (2, 'Daily bonus'),
+        (3, 'Bet'),
+        (4, 'Gamble return'),
         )
 
 # Create your models here.
@@ -53,6 +53,7 @@ class FuelUser(User):
 class Amount(models.Model):
     user = models.ForeignKey(User)
     time = models.DateTimeField('Time', default='', auto_now_add=True)
+    date = models.DateField('Date', default='', auto_now_add=True)
     amount = models.IntegerField('Amount', default=0)
     atype = models.IntegerField('Type', choices=TYPES, default=0)
     action = models.CharField('Action', max_length=100)
