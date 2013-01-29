@@ -8,7 +8,7 @@ DAILY_BONUS = 100
 
 TYPES = (
         (0, 'reserved'),
-        (1, 'Activity'),
+        (1, 'Fuel band'),
         (2, 'Daily bonus'),
         (3, 'Bet'),
         (4, 'Gamble return'),
@@ -46,6 +46,9 @@ class FuelUser(User):
     def status(self):
         return self.STATUS[self.profile.status]
 
+    def credit(self):
+        return self.STATUS[self.profile.status]
+
     class Meta:
         ordering = ['id']
         proxy = True
@@ -53,7 +56,7 @@ class FuelUser(User):
 class Amount(models.Model):
     user = models.ForeignKey(User)
     time = models.DateTimeField('Time', default='', auto_now_add=True)
-    date = models.DateField('Date', default='', auto_now_add=True)
+    #date = models.DateField('Date', default='', auto_now_add=True)
     amount = models.IntegerField('Amount', default=0)
     atype = models.IntegerField('Type', choices=TYPES, default=0)
     action = models.CharField('Action', max_length=100)

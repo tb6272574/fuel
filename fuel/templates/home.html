@@ -45,21 +45,51 @@
     $("#date").val(new Date().toJSON().substring(0,10));
   });
 </script>
-
 <div class="row">
-    <div class="span12">
-        <div>
-            <h3>Your Current Status</h3>
-            {% if user.profile.status == 'g' %}
-              <span class="badge badge-warning">Gold</span>
-            {% else %}
-              {% if user.profile.status == 's' %}
-              <span class="badge badge-default">Silver</span>
-              {% else %}
-                <span class="badge badge-important">Bronze</span>
-              {% endif %}
-            {% endif %}
+    <div class="span8">
+        <div class="container-fluid" style="padding:0">
+         <div class="row-fluid">                             
+          <div class="container-fluid" style="padding:0">
+          <div class="span8">                                
+           <div class="well">                                 
+           <h3> Input your activity </h3>               
+           <div class="row-fluid">
+           <input class="input span4" type="text" id="step" name="step" placeholder="Steps" value="{{ step }}">
+           </div>
+           <div class="row-fluid">
+           <input class="input span4" type="text" id="calories" name="calories" placeholder="Calorie" value="{{ calorie }}"> 
+           </div>
+           <div class="row-fluid">
+           <input class="input span4" type="text" id="fuel_score" name="fuel_score" placeholder="FuelScore" value="{{ fuel_score }}">                                           
+       </div>
+           <input class="input span4" type="date" id="date" name="date" placeholder="date" value="{{ date }}">
+           <button id="submit-button" name="submit-button" type="submit span2" class="btn btn-success btn-primary" style="float:right">Submit</button>                          
+           </div>
+           </div>
+          <div class="span4">
+              <div class="container-fluid" style="padding:0">
+                  <div class="row-fluid">
+              <div class="span12">
+                <button class="btn btn-large btn-info" style="margin: 5px; width:100%; height: 75px">Game!</button>
+            </div>
+        </div>
+        <div class="row-fluid">
+              <div class="span12">
+                <button class="btn btn-large btn-success" style="margin:5px; width:100%; height: 75px">What's this?</button>
+            </div>
+        </div>
+        <div class="row-fluid">
+              <div class="span12">
+                <button class="btn btn-large btn-primary" style="margin:5px; width:100%; height: 75px">FAQ</button>
+            </div>
+        </div>
+          </div>
 
+          </div>
+          </div>
+          </div>
+         <div class="row-fluid">
+          <div class="span12">
             <p>
               <h3>List of Activities</h3>
             </p>
@@ -67,11 +97,8 @@
             <thead>
 	    <tr> 
               <th>Date</th>
-              <th>Type</th>
-              <th>Steps</th>
-	      <th>Calories</th>
-	      <th>Fuel Score</th>
-	      <th>OIT 258 currency</th>
+              <th>Activity</th>
+	      <th>Credit</th>
             </tr>
 	    </thead>
 	    <tbody>
@@ -79,15 +106,15 @@
 	     <tr>
 	      <td>{{ amount.record.date }}</td>
 	      <td>{{ amount.get_atype_display }}</td>
-              {% if amount.atype == 1 %}
+              <!--{% if amount.atype == 1 %}
                  <td>{{ amount.record.steps }}</td>
-                 <td>{{ amountrecord.calories }}</td>
+                 <td>{{ amount.record.calories }}</td>
                  <td> {{ amount.record.fuelscore }}</td>
               {% else %}
                  <td></td>
                  <td></td>
                  <td></td>
-              {% endif %}
+              {% endif %}-->
               <td>{{ amount }}</td>
              </tr>
 	    {% endfor %}
@@ -95,33 +122,38 @@
            </table>
 	   </ul>
         </div>
+       </div>
     </div>
-     <div class="span12">
-      <div class="well">
-      <h3> Input your activity today </h3>
-      <input class="input span2" type="text" id="step" name="step" placeholder="#steps (e.g. 1000)" value="{{ step }}">
-      <input class="input span2" type="text" id="calories" name="calories" placeholder="#calorie (e.g. 500)" value="{{ calorie }}">
-      <input class="input span2" type="text" id="fuel_score" name="fuel_score" placeholder="fuel score (e.g. 2000)" value="{{ fuel_score }}">
-      <input class="input span3" type="text" id="note" name="note" placeholder="Note (e.g. Running at Gym)" value="{{ note }}">
-      <input class="input span2" type="date" id="date" name="date" placeholder="date" value="{{ date }}">
-      <button id="submit-button" name="submit-button" type="submit span2" class="btn btn-success btn-primary" style="float:right">Submit</button>
-      </div>
+   </div>
+   <div class="span4">
+     <div class="well">
+       <h3>{{ user.get_full_name }}</h3>
+       <h3> Credit: </h3>
+        {% if user.profile.status == 'g' %}
+        <span class="badge badge-warning">Gold</span>
+        {% else %}
+          {% if user.profile.status == 's' %}
+          <span class="badge badge-default">Silver</span>
+          {% else %}
+            <span class="badge badge-important">Bronze</span>
+          {% endif %}
+        {% endif %} 
      </div>
-     <div class "span12">
-      <img src="/static/img/coin.gif">
-     </div>
-     <div class="span12">
-      <div class="well">
-      <form class="form-inline" style="margin-bottom: 0" method="post">
-      <h3> Are you feeling lucky today? </h3>
-      <h4> Put down your bet here </h4>
-      {% csrf_token%}
-      <input class="input span4" type="text" id="stake" name="stake" placeholder="stake (e.g. 1000)" value="{{ stake }}">
-      <button id="bet-button" name="bet-button" type="submit span2" class="btn btn-info btn-primary" style="float:right">Bet!</button>
-      
-      </form>
+     <h3 id="list">Ranklist</h3>
+        
+      <div class="well" style="padding: 8px 0;">
+        <ul class="nav nav-list">
+          <li><a href="#">1&nbsp&nbsp&nbspChenguang Zhu</a></li>
+          <li><a href="#">2&nbsp&nbsp&nbspTom Yue</a></li>
+          <li><a href="#">3&nbsp&nbsp&nbspBalaji</a></li>
+          <li><a href="#">4&nbsp&nbsp&nbspChinmoy</a></li>
+          <li><a href="#">5&nbsp&nbsp&nbspHossein</a></li>
+          <li><a href="#">6&nbsp&nbsp&nbspCarrie</a></li>
+          <li><a href="#">...</a></li>
+          <li class="divider"></li>
+          <li><a href="#">1&nbsp&nbsp&nbspYou</a></li>
+        </ul>
       </div>
-     </div> 
-     </h4>
-    </div>
+   </div>
+</div>
 {% endblock %}}

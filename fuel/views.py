@@ -46,7 +46,7 @@ def login(request):
 
 def addloginbonus(request):
     #try:
-        #t=Amount.objects.filter(date=datetime.datetime.now()).filter(atype=2).get(user=request.user)
+        #t=Amount.objects.filter(time.date==datetime.datetime.now()).filter(atype=2).get(user=request.user)
     #    t=Amount.objects.get(user=request.user)
     #except ObjectDoesNotExist:
     #    Profile(user=request.user).add_daily_bonus()
