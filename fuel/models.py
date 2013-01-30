@@ -38,7 +38,7 @@ class FuelUser(User):
         return self.get_full_name()
 
     def start_date(self):
-        return self.profile.start_date.astimezone(pytz.timezone('America/Los_Angeles')).strftime('%m/%d/%y %H:%M:%S')
+        return self.profile.start_date.strftime('%m/%d/%y %H:%M:%S')
 
     def boost_day(self):
         return self.BOOST_DAYS[self.profile.boost_day]
@@ -55,13 +55,16 @@ class FuelUser(User):
 
 class Amount(models.Model):
     user = models.ForeignKey(User)
-    time = models.DateTimeField('Time', default='', auto_now_add=True)
-    #date = models.DateField('Date', default='', auto_now_add=True)
+    time = models.DateTimeField('Time', default='')
     amount = models.IntegerField('Amount', default=0)
     atype = models.IntegerField('Type', choices=TYPES, default=0)
     action = models.CharField('Action', max_length=100)
     def __unicode__(self):
         return u"%d" % (self.amount)
+    
+    def get_date(self):
+        tz=pytz.timezone('America/Los_Angeles')
+        return self.time.astimezone(tz).date()
 
 class Profile(models.Model):
     user = models.OneToOneField(User)
@@ -92,7 +95,9 @@ class Profile(models.Model):
         a.user = self.user
         a.amount = DAILY_BONUS
         a.atype = 2
-        a.action = 'Daily bonus for %s' % datetime.now().astimezone(pytz.timezone('America/Los_Angeles')).strftime('%m/%d/%y')
+        tz=pytz.timezone('America/Los_Angeles')
+        a.action = 'Daily bonus for %s' % tz.localize(datetime.datetime.now()).astimezone(tz).strftime('%m/%d/%y')
+        a.time = datetime.datetime.now()
         a.save()
 
     def current_amount(self):
@@ -115,6 +120,9 @@ class Record(models.Model):
         a.user = self.user
         a.amount = self.get_amount()
         a.atype = 1
+        a.time = datetime.datetime.now()
+        print 'savetime'
+        print a.time
         #a.action = 'FuelScore for %s' % date.strftime('%m/%d/%y')
         a.save()
         self.amount = a

@@ -4,9 +4,11 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidde
 from django.contrib import auth
 from fuel.models import FuelUser, Profile, Record, Amount
 from fuel.settings import WEBSITE_NAME
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
-import datetime
+import datetime, pytz
 
 def index(request):
     if request.user.is_anonymous():
@@ -35,7 +37,6 @@ def login(request):
         user = auth.authenticate(username=request.POST['email'], password=request.POST['password'])
 
         if user is not None and user.is_active:
-            #addloginbonus(request)
             auth.login(request, user)
             return HttpResponseRedirect(reverse('home'))
         else:
@@ -43,17 +44,6 @@ def login(request):
 
     else:
         return render_index(request, login_fail=True)
-
-def addloginbonus(request):
-    #try:
-        #t=Amount.objects.filter(time.date==datetime.datetime.now()).filter(atype=2).get(user=request.user)
-    #    t=Amount.objects.get(user=request.user)
-    #except ObjectDoesNotExist:
-    #    Profile(user=request.user).add_daily_bonus()
-
-    #t=Profile(user=request.user);
-    #t.add_daily_bonus()
-    print 'nothing'
 
 #add record
 def addrecord(request):
@@ -87,6 +77,17 @@ def addrecord(request):
     t.fuelscore = int(request.GET['fuel_score'])
     # then this will work
     t.save_amount()
+
+    tz=pytz.timezone('America/Los_Angeles')
+    today = datetime.datetime.now()
+    #today = tz.localize(today)
+    today = today.date()
+    for t in Amount.objects.all():#.filter(atype=2).filter(user=request.user):
+        print t.time.astimezone(tz)
+        print today
+        if (t.time.astimezone(tz).date() == today) and (t.atype==2) and (t.user == request.user):
+            return HttpResponse('ok')
+    request.user.get_profile().add_daily_bonus()
     return HttpResponse('ok')
 
 # requires logged in

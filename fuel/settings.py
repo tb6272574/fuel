@@ -99,6 +99,8 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'fuel.urls'
 
+AUTH_PROFILE_MODULE = 'fuel.Profile'
+
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'fuel.wsgi.application'
 
