@@ -3,7 +3,7 @@ $(document).ready(function() {
 var rows=$('table').find('tbody tr').length;
 var no_rec_per_page=5;
 var no_pages= Math.ceil(rows/no_rec_per_page);
-var $pagenumbers=$('<div id="pages">Pagination: </div>');
+var $pagenumbers=$('<div id="pages">Page: </div>');
 for(i=0;i<no_pages;i++)
 {
 $('<span class="page">'+(i+1)+'</span>').appendTo($pagenumbers);

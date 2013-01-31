@@ -108,12 +108,8 @@
 	    <tbody>
             {% for amount in user.amount_set.all %}
 	     <tr>
-              {% if amount.atype == 1 %}
-              <td>{{ amount.record.date }}</td>
-              {% else %}
-              <td>{{ amount.get_date }} </td>
-              {% endif %}
-	      <td>{{ amount.get_atype_display }}</td>
+              <td>{{ amount.get_date }}</td>
+              <td>{{ amount.action }}</td>
               <!--{% if amount.atype == 1 %}
                  <td>{{ amount.record.steps }}</td>
                  <td>{{ amount.record.calories }}</td>
@@ -136,7 +132,7 @@
    <div class="span4">
      <div class="well">
        <h3>{{ user.get_full_name }}</h3>
-       <h3> Credit: </h3>
+       <h3> Credit: {{ user.profile.current_amount }}</h3>
         {% if user.profile.status == 'g' %}
         <span class="badge badge-warning">Gold</span>
         {% else %}
@@ -146,6 +142,10 @@
             <span class="badge badge-important">Bronze</span>
           {% endif %}
         {% endif %} 
+        <div class="progress progress-danger progress-striped" style="margin:10px">
+            <div class="bar" style="width: {{ user.profile.progress }}%;"></div>
+            {{ user.profile.progressinfo }}
+        </div>
      </div>
      <h3 id="list">Ranklist</h3>
         
