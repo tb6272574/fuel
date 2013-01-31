@@ -11,7 +11,15 @@
             <div class="navbar-inner">
                 <div class="container">
                     <a class="brand" href="#">{{ website_name }}</a>
-                    <h5><p style="text-align:right">{% if not user.is_anonymous %} Welcome back, {{ user.get_full_name }} {% endif %}</p></h5>
+                    <h5>
+                         <p style="text-align:right">
+                             {% if not user.is_anonymous %} 
+                               Welcome back, {{ user.get_full_name }}
+                               </br></br>
+                               <a href="/logout/"><u>Logout</u></a>
+                             {% endif %}
+                             </p>
+                    </h5>
                 </div>
             </div>
         </div>

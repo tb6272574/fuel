@@ -92,6 +92,8 @@ def addrecord(request):
 
 # requires logged in
 def home(request):
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
     t = loader.get_template('home.html')
     c = RequestContext(request, {'website_name': WEBSITE_NAME})
     return HttpResponse(t.render(c))  
