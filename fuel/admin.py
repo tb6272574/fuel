@@ -1,4 +1,4 @@
-from fuel.models import FuelUser, Profile, Record, Amount
+from fuel.models import *
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from django.contrib import admin
@@ -14,3 +14,5 @@ admin.site.unregister(User)
 admin.site.register(FuelUser, UserProfileAdmin)
 admin.site.register(Record)
 admin.site.register(Amount)
+admin.site.register(FriendNode)
+admin.site.register(Scale)
