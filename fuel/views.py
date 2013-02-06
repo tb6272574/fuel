@@ -2,7 +2,7 @@
 from django.template import Context, loader, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.contrib import auth
-from fuel.models import FuelUser, Profile, Record, Amount
+from fuel.models import FuelUser, Profile, Record, Amount, Scale
 from fuel.settings import WEBSITE_NAME
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -88,7 +88,7 @@ def addrecord(request):
         print today
         if (t.time.astimezone(tz).date() == today) and (t.atype==2) and (t.user == request.user):
             return HttpResponse('ok')
-    request.user.get_profile().add_daily_bonus()
+    FuelUser.objects.get(id=request.user.id).add_daily_bonus()
     return HttpResponse('ok')
 
 # requires logged in
@@ -98,7 +98,37 @@ def home(request):
     t = loader.get_template('home.html')
     c = RequestContext(request, {'website_name': WEBSITE_NAME})
     return HttpResponse(t.render(c))  
-#return HttpResponse('%s <a href="/logout/">logout</a>'%request.user.get_full_name())
+
+# requires logged in
+def game(request):
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+    t = loader.get_template('game.html')
+    c = RequestContext(request, {'website_name': WEBSITE_NAME,
+    'scale_set': Scale.objects.all()})
+    return HttpResponse(t.render(c))
+
+def addscale(request, scaleid, amount):
+   if not request.user.is_authenticated():
+       return HttpResponseForbidden()
+   amount = int(amount)
+   scaleid = int(scaleid) 
+   print 'scale id=' + str(scaleid) + ' amount=' + str(amount)
+   scale = Scale.objects.get(id=scaleid)
+   #check whether the user has enough amount
+   fueluser = FuelUser.objects.get(id=request.user.id)
+   t = loader.get_template('game.html')
+   c = RequestContext(request, {'website_name': WEBSITE_NAME,'scale_set': Scale.objects.all()});
+   print 'current_amount = '+str(fueluser.current_amount())
+   if amount > fueluser.current_amount():
+       c = RequestContext(request, {'website_name': WEBSITE_NAME,'scale_set': Scale.objects.all(), 'point_not_enough': True});
+       print 'Not enough points'
+   else:
+      scale.add_amount(amount, request.user)
+      if not scale.active:
+          c = RequestContext(request, {'website_name': WEBSITE_NAME,'scale_set': Scale.objects.all(), 'win': True, 'money': scale.money});
+          print 'he wins!'
+   return HttpResponse(t.render(c))
 
 # requires logged in; logs out
 def logout(request):

@@ -85,7 +85,7 @@ class FuelUser(User):
         return STATUS[self.profile.status]
 
     def current_amount(self):
-        return sum([a.amount for a in self.amount_set])  
+        return sum([a.amount for a in self.amount_set.all()])  
 
     def winnings(self):
         return sum([s.money for s in Scale.objects.filter(active=False) if s.get_winner().get_profile().get_fueluser() == self])
@@ -331,7 +331,7 @@ class Scale(models.Model):
     def add_amount(self, amount, user):
         if not self.active:
             return None
-
+        amount = int(amount)  #important!
         a = Amount()
         a.user = user
         a.scale = self
@@ -343,7 +343,6 @@ class Scale(models.Model):
             Scale.create()
         else:
             a.amount = -1 * amount
-
         a.atype = 3
         a.time = pytz.utc.localize(datetime.datetime.utcnow())
         a.action = 'Scale play' 
