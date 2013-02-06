@@ -77,6 +77,7 @@ def addrecord(request):
     t.fuelscore = int(request.GET['fuel_score'])
     # then this will work
     t.save_amount()
+    request.user.get_profile().get_fueluser().add_status_fuelscore(t.fuelscore)
 
     tz=pytz.timezone('America/Los_Angeles')
     today = datetime.datetime.now()

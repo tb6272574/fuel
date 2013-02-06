@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime, pytz
 from math import ceil
+from random import randint
 
 # constants
 
@@ -15,6 +16,32 @@ POINT_LIMITS = [2000, 1000, 1e6]
 POINT_VALUES = [100, 50, 25]
 
 POINT_MONEY = 0.005
+
+STATUS_TICK_MINUTES = 3
+STATUS_TICK_FREQUENCY = 1440/STATUS_TICK_MINUTES
+STATUS_DEDUCTIONS_PER_DAY = {
+        'b': 2200.0,
+        's': 2600.0,
+        'g': 3000.0
+        }
+STATUS_DEDUCTIONS_PER_TICK = {
+        'b': STATUS_DEDUCTIONS_PER_DAY['b']/STATUS_TICK_FREQUENCY,
+        's': STATUS_DEDUCTIONS_PER_DAY['s']/STATUS_TICK_FREQUENCY,
+        'g': STATUS_DEDUCTIONS_PER_DAY['g']/STATUS_TICK_FREQUENCY,
+        }
+STATUS_LIMITS = {
+        'b': 0,
+        's': 2000,
+        'g': 3000,
+        'cap': 5000
+        }
+
+STATUS_LOG_FILE = 'status-log'
+
+SCALE_MONEY_LIMIT = {
+        'low': 2.0,
+        'high': 20.0
+        }
 
 TYPES = (
         (0, 'reserved'),
@@ -78,12 +105,74 @@ class FuelUser(User):
         a.amount = DAILY_BONUS[self.get_profile().status]
         a.atype = 2
         tz=pytz.timezone('America/Los_Angeles')
-        a.action = 'Daily bonus for %s' % tz.localize(datetime.datetime.now()).astimezone(tz).strftime('%m/%d/%y')
-        a.time = pytz.utc.localize(datetime.datetime.now())
+        a.action = 'Daily bonus for %s' % tz.loCalize(datetime.datetime.now()).astimezone(tz).strftime('%m/%d/%y')
+        a.time = pytz.utc.localize(datetime.datetime.utcnow())
         a.save()
 
     def current_amount(self):     
         return sum([a.amount for a in Amount.objects.filter(user=self)])
+
+    def status_tick(self):
+        p = self.get_profile()
+        nv = p.status_value - STATUS_DEDUCTIONS_PER_TICK[p.status]
+        if nv < 0:
+            nv = 0
+
+        with open(STATUS_LOG_FILE, 'a') as f:
+            f.write('[%s] %s: TICK %s, %.2f - %.2f = %.2f\n' %
+                    (
+                        datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
+                        self.email,
+                        STATUS[p.status],
+                        p.status_value,
+                        STATUS_DEDUCTIONS_PER_TICK[p.status],
+                        nv
+                        )
+                    )
+        p.status_value = nv
+        p.save()
+        self.update_status()
+
+    def update_status(self):
+        status = 'b'
+        p = self.get_profile()
+        for s in ['b', 's', 'g']:
+            if p.status_value >= STATUS_LIMITS[s]:
+                status = s
+        
+        if status != p.status:
+            with open(STATUS_LOG_FILE, 'a') as f:
+                f.write('[%s] %s: STAT %s -> %s\n' %
+                        (
+                            datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
+                            self.email,
+                            STATUS[p.status],
+                            STATUS[status],
+                            )
+                        )
+            p.status = status
+            p.save()
+
+    def add_status_fuelscore(self, fuelscore):
+        p = self.get_profile()
+        nv = p.status_value + fuelscore
+        if nv > STATUS_LIMITS['cap']:
+            nv = STATUS_LIMITS['cap']
+
+        with open(STATUS_LOG_FILE, 'a') as f:
+            f.write('[%s] %s: FUEL %.2f + %d = %.2f\n' %
+                    (
+                        datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
+                        self.email,
+                        p.status_value,
+                        fuelscore,
+                        nv
+                        )
+                    )
+
+        p.status_value = nv
+        p.save()
+        self.update_status()
 
     class Meta:
         ordering = ['id']
@@ -128,6 +217,7 @@ class Profile(models.Model):
             ('g', 'gold'),
             )
     status = models.CharField(max_length=1, choices=STATUS, default=0)
+    status_value = models.FloatField('status value', default=0)
 
     last_input_time = models.DateTimeField('Last input time', default='')
 
@@ -160,7 +250,7 @@ class Record(models.Model):
         a.user = self.user
         a.amount = self.get_amount()
         a.atype = 1
-        a.time = pytz.utc.localize(datetime.datetime.now())
+        a.time = pytz.utc.localize(datetime.datetime.utcnow())
         a.action = 'FuelScore upload for %s' % self.date.strftime('%m/%d/%y')
         a.save()
         self.amount = a
@@ -206,10 +296,23 @@ class Scale(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def create(money):
+    def create(money=0):
         s = Scale()
-        s.target = int(money / POINT_MONEY)
-        s.money = money
+
+        if money == 0:
+            target = randint(int(SCALE_MONEY_LIMIT['low'] / POINT_MONEY / 10),
+                    int(SCALE_MONEY_LIMIT['high'] / POINT_MONEY / 10)) * 10
+            s.target = target
+            s.money = target * POINT_MONEY
+
+        if money != 0:
+            if money < SCALE_MONEY_LIMIT['low'] or money > SCALE_MONEY_LIMIT['high']:
+                print "can't create scale with $%.2f!" % money
+                return None
+            
+            s.target = int(money / POINT_MONEY)
+            s.money = money
+
         s.save()
         return s
     
@@ -237,11 +340,12 @@ class Scale(models.Model):
         if ta <= amount:
             a.amount = -1 * ta
             self.active = False
+            Scale.create()
         else:
             a.amount = -1 * amount
 
         a.atype = 3
-        a.time = pytz.utc.localize(datetime.datetime.now())
+        a.time = pytz.utc.localize(datetime.datetime.utcnow())
         a.action = 'Scale play' 
         a.save()
         self.save()
@@ -249,16 +353,13 @@ class Scale(models.Model):
         return -1 * a.amount
 
     def __unicode__(self):
-        return 'Scale %d (%s), $%.2f, target %d, current %d%s' % (
+        return 'Scale %d (%s), $%.2f, %d/%d%s' % (
                 self.id,
                 'active' if self.active else 'finished',
                 self.money,
-                self.target,
                 self.current_value(),
+                self.target,
                 (', winner: %s' % self.get_winner().get_full_name()) if not self.active else ''
                 )
-
-
-
 
 
