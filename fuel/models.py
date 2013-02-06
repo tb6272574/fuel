@@ -58,7 +58,7 @@ class FuelUser(User):
         return STATUS[self.profile.status]
 
     def current_amount(self):
-        return sum([a.amount for a in self.amount_set])  
+        return sum([a.amount for a in self.amount_set.all()])  
 
     def winnings(self):
         return sum([s.money for s in Scale.objects.filter(active=False) if s.get_winner().get_profile().get_fueluser() == self])
@@ -81,9 +81,6 @@ class FuelUser(User):
         a.action = 'Daily bonus for %s' % tz.localize(datetime.datetime.now()).astimezone(tz).strftime('%m/%d/%y')
         a.time = pytz.utc.localize(datetime.datetime.now())
         a.save()
-
-    def current_amount(self):     
-        return sum([a.amount for a in Amount.objects.filter(user=self)])
 
     class Meta:
         ordering = ['id']
@@ -228,7 +225,7 @@ class Scale(models.Model):
     def add_amount(self, amount, user):
         if not self.active:
             return None
-
+        amount = int(amount)  #important!
         a = Amount()
         a.user = user
         a.scale = self
@@ -239,7 +236,6 @@ class Scale(models.Model):
             self.active = False
         else:
             a.amount = -1 * amount
-
         a.atype = 3
         a.time = pytz.utc.localize(datetime.datetime.now())
         a.action = 'Scale play' 

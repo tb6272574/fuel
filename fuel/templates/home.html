@@ -102,7 +102,7 @@
 	    <tr> 
                 <th><h4>Date</h4></th>
                 <th><h4>Activity</h4></th>
-                <th><h4>Credit</h4></th>
+                <th><h4>Points</h4></th>
             </tr>
 	    </thead>
 	    <tbody>
@@ -123,7 +123,7 @@
    <div class="span4">
      <div class="well">
        <h3>{{ user.get_full_name }}</h3>
-       <h3> Points: {{ user.profile.get_fueluser.current_amount }}</h3>
+       <h3> Points: {{ user.get_fueluser.current_amount }}</h3>
        <h3> Winnings: ${{ user.profile.get_fueluser.winnings }}</h3>
         {% if user.profile.status == 'g' %}
         <span class="badge badge-warning">Gold</span>

@@ -8,6 +8,8 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'fuel.views.index', name='index'),
     url(r'^home/$', 'fuel.views.home', name='home'),
+    url(r'^game/$', 'fuel.views.game', name='game'),
+    url(r'^action/addscale/(?P<scaleid>\d+)/(?P<amount>\d+)/$', 'fuel.views.addscale', name='addscale'),
     url(r'^login/$', 'fuel.views.login', name='login'),
     url(r'^logout/$', 'fuel.views.logout', name='logout'),
     url(r'^addrecord/', 'fuel.views.addrecord', name='addrecord'),
