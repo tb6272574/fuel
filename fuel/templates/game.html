@@ -1,0 +1,71 @@
+{% extends 'frame.html' %}
+{% block title %}game{% endblock %}
+{% block content %}
+<script src="/static/js/pagination.js" type="text/javascript"></script>
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+  $(document).ready(function() {
+  });
+</script>
+<div class="span12">
+  <h2> Game </h2>    
+</div>
+<div class="well span12">
+   <h3> Active Scales </h3>
+   <ul class="thumbnails">
+   {% for scale in scale_set %}
+      {% if scale.active %}
+        <li class="span4" align="center">
+         <img src="/static/img/scale_tilt.jpg"></img>
+         <h4>Current total points: {{ scale.current_value }}<h4>
+         <div class="row-fluid">
+             <div class="span4">
+                <form method="POST" action="/action/addscale/{{ scale.id }}/10/">
+                {% csrf_token %}
+                <button id="add10" name="add10" class="btn btn-success" style="margin: 2px;">10 points</button>
+                </form>
+             </div>
+             <div class="span4">                         
+                <form method="POST" action="/action/addscale/{{ scale.id }}/50/">
+                {% csrf_token %}
+                <button id="add50" name="add50" class="btn btn-info" style="margin: 2px;">50 points</button>  
+                </form>
+             </div>
+             <div class="span4">                         
+                <form method="POST" action="/action/addscale/{{ scale.id }}/100/">
+                {% csrf_token %}
+                <button id="add100" name="add100" class="btn btn-primary" style="margin: 2px;">100 points</button>  
+                </form>
+            </div>
+         </div>             
+        </li>
+      {% endif %}
+   {% endfor %}
+   {% if point_not_enough %}
+       <span id="span4"> <h4> Sorry! Your points are not sufficient </h4></span>
+   {% endif %}
+   {% if win %}
+       <span id="span4"> <h4> Congratulations! You have won {{ money }} dollars! </h4></span>
+   {% endif %}
+   </ul>
+</div>
+<hr>
+<div class="well span12">
+   <h3> Finished Scales </h3>
+   <ul class="thumbnails">
+   {% for scale in scale_set %}
+      {% if not scale.active %}
+        <li class="span4" align="center">
+         <img src="/static/img/scale_even.jpg"></img>
+         <h4>Winner: {{ scale.get_winner.get_full_name }}</h4>
+         <h4>Money: {{ scale.money }} dollars</h4>
+         <h4>Target points: {{ scale.target }}</h4>
+        </li>
+      {% endif %}
+   {% endfor %}
+   </ul>
+</div>
+
+
+{% endblock %}}
