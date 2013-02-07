@@ -5,8 +5,15 @@
     {% for scale in active_scales %}
     <div class="span4">
         <div class="well">
-        <img src="/static/img/scale_tilt.jpg"></img>
-        <h4>Current total points: {{ scale.current_value }}</h4>
+            <div style="position: relative;">
+                <img src="/static/img/scale_tilt.jpg">
+                <div style="position:absolute;top:42px;left:48px;width:40px">
+                    <p> <center> <b> {{ scale.current_value }} points </b> </center></p>
+                </div>
+                <div style="position:absolute;top:78px;left:170px;">
+                  <img src="/static/img/prize.png" height="48" width="38">
+                </div>
+            </div>
         <form method="POST" action="/action/addscale/{{ scale.id }}/10/">
             {% csrf_token %}
             <button id="add10" name="add10" class="btn btn-success btn-small" style="margin: 2px;">Add 10 pts</button>
