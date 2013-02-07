@@ -139,24 +139,29 @@ def game(request):
     s_finished = sorted(Scale.objects.filter(active=False), key=lambda scale: scale.get_end_time(), reverse=True)
 
     c = RequestContext(request, {'website_name': WEBSITE_NAME, 'active_scales': s_active, 'finished_scales': s_finished})
+    
+    cookies_to_delete = []
+    
     if GAME_ALREADY_FINISHED in request.COOKIES:
         c.update({GAME_ALREADY_FINISHED: True})
-        response.delete_cookie(key=GAME_ALREADY_FINISHED)
+        cookies_to_delete.append(GAME_ALREADY_FINISHED)
 
     if GAME_NOT_ENOUGH_POINTS in request.COOKIES:
         c.update({GAME_NOT_ENOUGH_POINTS: True})
-        response.delete_cookie(key=GAME_NOT_ENOUGH_POINTS)
+        cookies_to_delete.append(GAME_NOT_ENOUGH_POINTS)
 
     if GAME_WON in request.COOKIES:
         c.update({GAME_WON: True, GAME_MONEY: float(request.COOKIES[GAME_MONEY])})
-        response.delete_cookie(key=GAME_WON)
-        response.delete_cookie(key=GAME_MONEY)
+        cookies_to_delete.append(GAME_WON)
+        cookies_to_delete.append(GAME_MONEY)
 
     if GAME_SPEND in request.COOKIES:
         c.update({GAME_SPEND: int(request.COOKIES[GAME_SPEND])})
-        response.delete_cookie(key=GAME_SPEND)
+        cookies_to_delete.append(GAME_SPEND)
 
-    return HttpResponse(t.render(c))
+    response = HttpResponse(t.render(c))
+    [response.delete_cookie(x) for x in cookies_to_delete]
+    return response
 
 def addscale(request, scaleid, amount):
     if not request.user.is_authenticated():
