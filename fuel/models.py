@@ -105,7 +105,7 @@ class FuelUser(User):
         a.amount = DAILY_BONUS[self.get_profile().status]
         a.atype = 2
         tz=pytz.timezone('America/Los_Angeles')
-        a.action = 'Daily bonus for %s' % tz.loCalize(datetime.datetime.now()).astimezone(tz).strftime('%m/%d/%y')
+        a.action = 'Daily bonus for %s' % tz.localize(datetime.datetime.now()).astimezone(tz).strftime('%m/%d/%y')
         a.time = pytz.utc.localize(datetime.datetime.utcnow())
         a.save()
 

@@ -107,6 +107,28 @@ def home(request):
 
     return HttpResponse(t.render(c))  
 
+def stats(request):
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+    fuelscore = '{name:\"FuelScore\", values:['
+    steps = '{name:\"Steps\", values:[' 
+    calories = '{name:\"Calories\", values:[' 
+    points = '{name:\"Points\", values:[' 
+    for t in request.user.record_set.all():
+        fuelscore = fuelscore + str(t.fuelscore) + ','
+        steps = steps + str(t.steps) + ','
+        calories = calories + str(t.calories) + ','
+        points = points + str(t.get_amount()) + ','
+    fuelscore = fuelscore + ']},'
+    steps = steps + ']},'
+    calories = calories + ']},'
+    points = points + ']},'
+    userdata = '[' + fuelscore + steps + calories + points + ']'
+    print userdata
+    t = loader.get_template('stats.html')
+    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'userdata': userdata})
+    return HttpResponse(t.render(c))
+
 # requires logged in
 def game(request):
     if not request.user.is_authenticated():

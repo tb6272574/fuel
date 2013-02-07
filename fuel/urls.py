@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^login/$', 'fuel.views.login', name='login'),
     url(r'^logout/$', 'fuel.views.logout', name='logout'),
     url(r'^addrecord/', 'fuel.views.addrecord', name='addrecord'),
+    url(r'^stats/$', 'fuel.views.stats', name='stats'),
     # url(r'^gsburn/', include('gsburn.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
