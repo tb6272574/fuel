@@ -55,7 +55,7 @@
     <div class="span4">
         <div class="navbar" style="margin-bottom: 0">
             <div class="navbar-inner" style="padding-left: 0">
-                <span style="display: inline-block; float: left; width: 50px; height: 50px; background-color: #f0f0f0; border-radius: 3px">&nbsp;</span>
+                <img class="face-picture" src="/static/img/student-pictures/{{ user.profile.get_fueluser.image_url }}">
                 <span class="nav-title nav-username">{{ user.get_full_name }}</span>
             </div>
         </div>
@@ -70,9 +70,11 @@
             </div>
         </div>
         <div class="well" style="position: relative; top: -5px; z-index: -100">
+            <ul>
             {% for friend in user.profile.get_fueluser.friends %}
-            {{ friend.get_full_name }}
+            <li>{{ friend.get_full_name }}</li>
             {% endfor %}
+        </ul>
         </div>
     </div>
     <div class="span8">

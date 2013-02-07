@@ -23,48 +23,20 @@
     </div>
     <div class="span6">
         <div class="well">
-        <form class="form-inline" style="margin-bottom: 0" method="post" action="{% url login %}">
-            <h3>Log in to {{ website_name }}</h3>
-            {% csrf_token %}
-            <input class="input span2" type="text" name="email" placeholder="@stanford.edu" value="{{ email }}">
-            <input class="input span2" type="password" name="password" placeholder="password">
-            <button type="submit" class="btn btn-success" style="width: 100px; float:right">Log in</button>
-    </form>
+            <form class="form-inline" style="margin-bottom: 0" method="post" action="{% url login %}">
+                <h3>Log in to {{ website_name }}</h3>
+                {% csrf_token %}
+                <input class="input span2" type="text" name="email" placeholder="@stanford.edu" value="{{ email }}">
+                <input class="input span2" type="password" name="password" placeholder="password">
+                <button type="submit" class="btn btn-success" style="width: 100px; float:right">Log in</button>
+            </form>
             {% if login_fail %}
             <span id="auth-alert" class="alert alert-danger" style="display: block; margin-bottom: 0; margin-top: 10px">
                 Your email or password was incorrect.
                 <button type="button" class="close" onclick="$('span#auth-alert').remove();">&times;</button>
             </span>
-        {% endif %}
-</div>
-        <table class="table table-striped table-condensed table-hover" id="ranking">
-            <thead>
-                <tr>
-                    <th><h4>Rank</h4></th>
-                    <th><h4>Name</h4></th>
-                    <th><h4>Status</h4></th>
-                    <th><h4>FuelScore</h4></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Chenguang Zhu</td>
-                    <td><span class="badge badge-warning">Gold</span></td>
-                    <td>12300</td>
-                    <tr>
-                        <td>2</td>
-                        <td>Tom Yue</td>
-                        <td><span class="badge badge-default">Silver</span></td>
-                        <td>12200</td>
-                        <tr>
-                            <td>3</td>
-                            <td>Balaji Prabhakar</td>
-                            <td><span class="badge badge-important">Bronze</span></td>
-                            <td>12000</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            {% endif %}
         </div>
-        {% endblock %}
+    </div>
+</div>
+{% endblock %}

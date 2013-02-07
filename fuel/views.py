@@ -207,3 +207,40 @@ def history(request):
         'amounts_paged': [aset[i*chunk_size:(i+1)*chunk_size] for i in range(int(math.ceil(len(aset)/float(chunk_size))))]
         })
     return HttpResponse(t.render(c))
+
+def settings(request):
+    t = loader.get_template('settings.html')
+    c = RequestContext(request, {'website_name': WEBSITE_NAME})
+    if request.method == 'GET':
+        return HttpResponse(t.render(c))
+    
+    # change password
+    action = request.POST['action']
+    if action == 'update_password':
+        old_pw = request.POST['old_pw']
+        new_pw = request.POST['new_pw']
+        new_pw_conf = request.POST['new_pw_conf']
+
+        # verify that old_pw is correct
+        u = authenticate(username=request.user.username, password=old_pw)
+
+        # can't auth
+        if u is None:
+            c.update({'error_old_pw': True})
+
+        # new_pw doesn't match new_pw_conf
+        if new_pw != new_pw_conf:
+            c.update({'error_mismatch': True})
+
+        # can't be blank
+        if len(new_pw) < 6:
+            c.update({'error_too_short': True})
+
+        # set as new password
+        request.user.set_password(new_pw)
+        request.user.save()
+        c.update({'pw_success': True})
+
+    return HttpResponse(t.render(c))
+
+        

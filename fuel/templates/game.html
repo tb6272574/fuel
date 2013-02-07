@@ -1,5 +1,13 @@
 {% extends 'frame.html' %}
 {% block title %}game{% endblock %}
+{% block head %}
+<script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#won-modal").modal();
+        });
+</script>
+{% endblock %}
 {% block content %}
 <div class="row">
     {% for scale in active_scales %}
@@ -11,22 +19,22 @@
                     <p> <center> <b> {{ scale.current_value }} points </b> </center></p>
                 </div>
                 <div style="position:absolute;top:78px;left:170px;">
-                  <img src="/static/img/prize.png" height="48" width="38">
+                    <img src="/static/img/prize.png" height="48" width="38">
                 </div>
             </div>
-        <form method="POST" action="/action/addscale/{{ scale.id }}/10/">
-            {% csrf_token %}
-            <button id="add10" name="add10" class="btn btn-success btn-small" style="margin: 2px;">Add 10 pts</button>
-        </form>
-        <form method="POST" action="/action/addscale/{{ scale.id }}/50/">
-            {% csrf_token %}
-            <button id="add50" name="add50" class="btn btn-info btn-small" style="margin: 2px;">Add 50 pts</button>  
-        </form>
-        <form method="POST" action="/action/addscale/{{ scale.id }}/100/">
-            {% csrf_token %}
-            <button id="add100" name="add100" class="btn btn-primary btn-small" style="margin: 2px;">Add 100 pts</button>  
-        </form>
-    </div>
+            <form method="POST" action="/action/addscale/{{ scale.id }}/10/">
+                {% csrf_token %}
+                <button id="add10" name="add10" class="btn btn-success btn-small" style="margin: 2px;">Add 10 pts</button>
+            </form>
+            <form method="POST" action="/action/addscale/{{ scale.id }}/50/">
+                {% csrf_token %}
+                <button id="add50" name="add50" class="btn btn-info btn-small" style="margin: 2px;">Add 50 pts</button>  
+            </form>
+            <form method="POST" action="/action/addscale/{{ scale.id }}/100/">
+                {% csrf_token %}
+                <button id="add100" name="add100" class="btn btn-primary btn-small" style="margin: 2px;">Add 100 pts</button>  
+            </form>
+        </div>
     </div>
     {% endfor %}
     {% if not_enough_points %}
@@ -59,5 +67,7 @@
         </table>
     </div> <!-- span12 -->
 </div> <!-- row -->
-
+<div class="modal hide fade" id="won-modal">
+    hi
+</div>
 {% endblock %}}

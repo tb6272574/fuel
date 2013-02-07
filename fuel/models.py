@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 import datetime, pytz
 from math import ceil
 from random import randint
+import re
 
 # constants
 
@@ -74,6 +75,12 @@ class FuelUser(User):
 
     def name(self):
         return self.get_full_name()
+
+    def image_url(self):
+        return "%s-%s.jpg" % (
+                re.sub('[^a-z]+','',self.last_name.lower()),
+                self.first_name[0].lower()
+                )
 
     def start_date(self):
         return self.profile.start_date.strftime('%m/%d/%y %H:%M:%S')
@@ -198,7 +205,7 @@ class Amount(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User)
-    start_date = models.DateTimeField('Started', default='', auto_now_add=True)
+    start_date = models.DateTimeField('Started', auto_now_add=True)
  
     DAYS_OF_WEEK = (
             ('M', 'Monday'),
@@ -219,7 +226,7 @@ class Profile(models.Model):
     status = models.CharField(max_length=1, choices=STATUS, default=0)
     status_value = models.FloatField('status value', default=0)
 
-    last_input_time = models.DateTimeField('Last input time', default='')
+    last_input_time = models.DateTimeField('Last input time', auto_now_add=True)
 
     def get_fueluser(self):
         return FuelUser.objects.get(id=self.user.id)
@@ -285,6 +292,41 @@ def import_friendships(filename, count):
             l = [int(x)-1 for x in line.strip().split(' ')]
             print "adding friends %d and %d" % (l[0], l[1])
             nodes[l[0]].add_friend(nodes[l[1]])
+
+def import_users(filename):
+    with open(filename, 'r') as f:
+        for line in f:
+            email,last,first = line.split(',')
+            
+            # search user to make sure he's not instantiated alreadyi
+            if len(User.objects.filter(email=email)) > 0:
+                continue
+
+            u = User()
+            u.username = email
+            u.first_name = first
+            u.last_name = last
+            u.email = email
+            u.set_password(email.split('@')[0])
+            u.save()
+
+            # set up profile
+            p = Profile()
+            p.user = u
+            p.boost_day = 'M'
+            p.status = 'b'
+            p.status_value = 0
+            p.save()
+
+            # set up friends
+            f = FriendNode.objects.filter(user=None).order_by('?')[0]
+            f.user = u
+
+            f.save()
+
+            
+            
+
 
 
 ### GAME MODELS ###
@@ -364,5 +406,4 @@ class Scale(models.Model):
                 self.target,
                 (', winner: %s' % self.get_winner().get_full_name()) if not self.active else ''
                 )
-
 
