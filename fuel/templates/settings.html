@@ -1,0 +1,55 @@
+{% extends "frame.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        <h1>Settings</h1>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="span4">
+        <h3>Password</h3>
+    </div>
+    <div class="span8">
+        <form class="form-horizontal" method="post" action="{% url settings %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_password">
+            <div class="control-group {% if error_old_pw %}error{% endif %}">
+                <label class="control-label" for="old_pw">Current password</label>
+                <div class="controls">
+                    <input type="password" id="old_pw" name="old_pw"></input>
+                    {% if error_old_pw %}
+                    <span class="help-block alert alert-error">You must supply your enter your current password correctly.</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="control-group {% if error_too_short %}error{% endif %}">
+                <label class="control-label" for="new_pw">New password</label>
+                <div class="controls">
+                    <input type="password" id="new_pw" name="new_pw"></input>
+                    {% if error_too_short %}
+                    <span class="help-block alert alert-error">Your new password must contain at least 6 characters.</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="control-group {% if error_mismatch %}error{% endif %}">
+                <label class="control-label" for="new_pw_conf">Confirm new password</label>
+                <div class="controls">
+                    <input type="password" id="new_pw_conf" name="new_pw_conf"></input>
+                    {% if error_mismatch %}
+                    <span class="help-block alert alert-error">Your new passwords did not match.</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                {% if pw_success %}
+                <span class="help-inline alert alert-success" style="margin-top: 10px">Password successfully updated.</span>
+                {% endif %}
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

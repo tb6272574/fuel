@@ -1,0 +1,80 @@
+{% extends "frame.html" %}
+{% block title %}Points balance{% endblock %}
+{% block head %}
+<script type="text/javascript">
+    cur_page = 1;
+    page_count = {{ amounts_paged|length }};
+    function show_page (page) {
+        if (page < 1 || page > page_count) return;
+
+        $("#page-"+cur_page).hide();
+        $("#page-"+page).show();
+        $("#pager-li-"+cur_page).removeClass("active");
+        $("#pager-li-"+page).addClass("active");
+
+        if (page == 1) $("#pager-li-prev").addClass("disabled");
+        else $("#pager-li-prev").removeClass("disabled");
+
+        if (page == page_count) $("#pager-li-next").addClass("disabled");
+        else $("#pager-li-next").removeClass("disabled");
+
+        cur_page = page;
+    }
+    $(document).ready(function() {
+        // paging
+        $("#pager-prev").click(function() {
+            show_page(cur_page - 1);
+            return false;
+        });
+
+        $("#pager-next").click(function() {
+            show_page(cur_page + 1);
+            return false;
+        });
+
+        $("[id^=pager-page]").each(function() {
+            $(this).click(function () {
+                show_page ($(this).attr('id').split('-').pop());
+                return false;
+            });
+        });
+        show_page(1);
+    });
+</script>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        <h1>Points balance</h1>
+        <div class="pagination pagination-centered pagination-small">
+            <ul>
+                <li id="pager-li-prev"><a id="pager-prev" href="#">&laquo;</a></li>
+                {% for amounts in amounts_paged %}
+                <li id="pager-li-{{ forloop.counter }}"><a id="pager-page-{{ forloop.counter }}" href="#">{{ forloop.counter }}</a></li>
+                {% endfor %}
+                <li id="pager-li-next"><a id="pager-next" href="#">&raquo;</a></li>
+            </ul>
+        </div>
+        {% for amounts in amounts_paged %}
+        <table class="table table-striped table-condensed table-hover hidden" id="page-{{ forloop.counter }}">
+            <thead>
+                <tr> 
+                    <th style="width: 200px">Date</th>
+                    <th>Activity</th>
+                    <th style="width: 100px; text-align:right">Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for amount in amounts %}
+                <tr>
+                    <td>{{ amount.time }}</td>
+                    <td>{{ amount.action }}</td>
+                    <td style="text-align:right">{{ amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </div> <!-- span12 -->
+</div> <!-- row-fluid -->
+{% endblock %}
