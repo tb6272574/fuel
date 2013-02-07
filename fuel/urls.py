@@ -7,7 +7,9 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'fuel.views.index', name='index'),
+    url(r'^faq/$', 'fuel.views.faq', name='faq'),
     url(r'^home/$', 'fuel.views.home', name='home'),
+    url(r'^history/$', 'fuel.views.history', name='history'),
     url(r'^game/$', 'fuel.views.game', name='game'),
     url(r'^action/addscale/(?P<scaleid>\d+)/(?P<amount>\d+)/$', 'fuel.views.addscale', name='addscale'),
     url(r'^login/$', 'fuel.views.login', name='login'),

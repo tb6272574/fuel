@@ -9,6 +9,13 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 import datetime, pytz
+import math
+
+GAME_NOT_ENOUGH_POINTS = 'not_enough_points'
+GAME_ALREADY_FINISHED = 'already_finished'
+GAME_WON = 'won'
+GAME_MONEY = 'money'
+GAME_SPEND = 'spend'
 
 def index(request):
     if request.user.is_anonymous():
@@ -97,41 +104,84 @@ def home(request):
         return HttpResponseForbidden()
     t = loader.get_template('home.html')
     c = RequestContext(request, {'website_name': WEBSITE_NAME})
+
     return HttpResponse(t.render(c))  
 
 # requires logged in
 def game(request):
     if not request.user.is_authenticated():
         return HttpResponseForbidden()
+    
     t = loader.get_template('game.html')
-    c = RequestContext(request, {'website_name': WEBSITE_NAME,
-    'scale_set': Scale.objects.all()})
+    s_active = Scale.objects.filter(active=True)
+    s_finished = sorted(Scale.objects.filter(active=False), key=lambda scale: scale.get_end_time(), reverse=True)
+
+    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'active_scales': s_active, 'finished_scales': s_finished})
+    if GAME_ALREADY_FINISHED in request.COOKIES:
+        c.update({GAME_ALREADY_FINISHED: True})
+        response.delete_cookie(key=GAME_ALREADY_FINISHED)
+
+    if GAME_NOT_ENOUGH_POINTS in request.COOKIES:
+        c.update({GAME_NOT_ENOUGH_POINTS: True})
+        response.delete_cookie(key=GAME_NOT_ENOUGH_POINTS)
+
+    if GAME_WON in request.COOKIES:
+        c.update({GAME_WON: True, GAME_MONEY: float(request.COOKIES[GAME_MONEY])})
+        response.delete_cookie(key=GAME_WON)
+        response.delete_cookie(key=GAME_MONEY)
+
+    if GAME_SPEND in request.COOKIES:
+        c.update({GAME_SPEND: int(request.COOKIES[GAME_SPEND])})
+        response.delete_cookie(key=GAME_SPEND)
+
     return HttpResponse(t.render(c))
 
 def addscale(request, scaleid, amount):
-   if not request.user.is_authenticated():
-       return HttpResponseForbidden()
-   amount = int(amount)
-   scaleid = int(scaleid) 
-   print 'scale id=' + str(scaleid) + ' amount=' + str(amount)
-   scale = Scale.objects.get(id=scaleid)
-   #check whether the user has enough amount
-   fueluser = FuelUser.objects.get(id=request.user.id)
-   t = loader.get_template('game.html')
-   c = RequestContext(request, {'website_name': WEBSITE_NAME,'scale_set': Scale.objects.all()});
-   print 'current_amount = '+str(fueluser.current_amount())
-   if amount > fueluser.current_amount():
-       c = RequestContext(request, {'website_name': WEBSITE_NAME,'scale_set': Scale.objects.all(), 'point_not_enough': True});
-       print 'Not enough points'
-   else:
-      scale.add_amount(amount, request.user)
-      if not scale.active:
-          c = RequestContext(request, {'website_name': WEBSITE_NAME,'scale_set': Scale.objects.all(), 'win': True, 'money': scale.money});
-          print 'he wins!'
-   return HttpResponse(t.render(c))
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+    
+    amount = int(amount)
+    scaleid = int(scaleid) 
+    print 'scale id=' + str(scaleid) + ' amount=' + str(amount)
+    scale = Scale.objects.get(id=scaleid)
+
+    #check whether the user has enough amount
+    fueluser = FuelUser.objects.get(id=request.user.id)
+
+    print 'current_amount = '+str(fueluser.current_amount())
+
+    response = HttpResponseRedirect(reverse('game'))
+
+    if amount > fueluser.current_amount():
+        response.set_cookie(key=GAME_NOT_ENOUGH_POINTS, value=True, max_age=60)
+    elif not scale.active:
+        response.set_cookie(key=GAME_ALREADY_FINISHED, value=True, max_age=60)
+    else:
+        spent_amount = scale.add_amount(amount, request.user)
+        if not scale.active:
+            response.set_cookie(key=GAME_WON, value=True, max_age=60)
+            response.set_cookie(key=GAME_MONEY, value=scale.money, max_age=60)
+        response.set_cookie(key=GAME_SPEND, value=spent_amount, max_age=60)
+
+    return response
 
 # requires logged in; logs out
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect(reverse('login'))
 
+def faq(request):
+    t = loader.get_template('faq.html')
+    c = RequestContext(request, {'website_name': WEBSITE_NAME})
+    return HttpResponse(t.render(c))
+
+def history(request):
+    t = loader.get_template('history.html')
+    c = RequestContext(request, {'website_name': WEBSITE_NAME})
+    # page the activities
+    aset = request.user.amount_set.all()
+    chunk_size = 10
+    c.update({
+        'amounts_paged': [aset[i*chunk_size:(i+1)*chunk_size] for i in range(int(math.ceil(len(aset)/float(chunk_size))))]
+        })
+    return HttpResponse(t.render(c))

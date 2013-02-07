@@ -323,6 +323,10 @@ class Scale(models.Model):
         self.money = target * POINT_MONEY
         self.save()
 
+    def get_end_time(self):
+        if self.active:
+            return None
+        return self.amount_set.all()[0].time
     def get_winner(self):
         if self.active:
             return None

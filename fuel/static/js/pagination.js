@@ -3,10 +3,10 @@ $(document).ready(function() {
 var rows=$('table').find('tbody tr').length;
 var no_rec_per_page=5;
 var no_pages= Math.ceil(rows/no_rec_per_page);
-var $pagenumbers=$('<div id="pages">Page: </div>');
+var $pagenumbers=$('<div id="pages" class="pagination"><ul></ul></div>');
 for(i=0;i<no_pages;i++)
 {
-$('<span class="page">'+(i+1)+'</span>').appendTo($pagenumbers);
+$('<li><a href="#">'+(i+1)+'</a></li>').appendTo($pagenumbers);
 }
 $pagenumbers.insertAfter('table');
 $('.page').hover(
