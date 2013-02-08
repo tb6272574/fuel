@@ -194,7 +194,7 @@ class Amount(models.Model):
     action = models.CharField('Action', max_length=100)
     
     def __unicode__(self):
-        return u"%d" % (self.amount)
+        return u"#%d (%d)" % (self.id, self.amount)
     
     def get_date(self):
         tz=pytz.timezone('America/Los_Angeles')
@@ -263,6 +263,8 @@ class Record(models.Model):
         self.amount = a
         self.save()
 
+    class Meta:
+        ordering = ['-date'];
 
 class FriendNode(models.Model):
 
@@ -361,6 +363,10 @@ class Scale(models.Model):
     def current_value(self):
         return sum([-1 * x.amount for x in self.amount_set.all()])
 
+    def get_money(self):
+        return "$%.2f" % self.money
+    get_money.short_description = 'Money'
+
     def set_money(self):
         self.money = target * POINT_MONEY
         self.save()
@@ -369,10 +375,12 @@ class Scale(models.Model):
         if self.active:
             return None
         return self.amount_set.all()[0].time
+
     def get_winner(self):
         if self.active:
             return None
         return self.amount_set.all()[0].user
+    get_winner.short_description = 'Winner'
 
     def add_amount(self, amount, user):
         if not self.active:

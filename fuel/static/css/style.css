@@ -6,8 +6,9 @@ img.face-picture {
     float: left;
     width: 50px;
     height: 50px;
-    background-color: #f0f0f0;
-    border-radius: 3px
+    border-radius: 3px;
+    box-shadow: inset 0px 0px 10px #000000;
+    -webkit-box-shadow: inset 0px 0px 10px #000000;
 }
 
 span.nav-title {
@@ -27,8 +28,55 @@ span.big-numbers {
     text-shadow: 1px 1px 0 rgba(0,0,0,.2);
 }
 
+div.navbar-inner.small {
+    min-height: 25px;
+    height: 25px;
+    color: #ffffff;
+    text-shadow: 0px -1px 0 rgba(0,0,0,.2);
+}
+
 
 span.nav-title.nav-username {
     margin-left: 0;
 }
 
+input.input-large-font {
+    font-size: 24pt;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 rgba(0,0,0,.2);
+    height: 48px;
+    text-align: right;
+}
+
+input.input-styled {
+    position: relative;
+    top: -5px;
+    z-index: 100;
+}
+
+div.calendar-form {
+    margin-top: 3px;
+    border-left: 1px solid #c0c0c0;
+}
+
+table.calendar td.day {
+    text-align:center;
+}
+table.calendar td.day-available:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+table.calendar td.day-done {
+    background-color: #fda;
+}
+
+table.calendar td.day-done:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+table.calendar td.day-future {
+    background-color: #f0f0f0;
+    cursor: default;
+}
