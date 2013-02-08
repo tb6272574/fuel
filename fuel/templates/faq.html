@@ -1,8 +1,185 @@
-{% extends "frame.html" %}
-{% block content %}
-<div class="row">
-    <div class="span12">
-        <h1>FAQ</h1>
-    </div>
-</div>
+{% extends 'frame.html' %}
+{% block title %}stats{% endblock %}
+{% block head %}
+<script src="/static/js/protovis.js" type="text/javascript"></script>
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
 {% endblock %}
+{% block bodyprop %} data-spy="scroll" data-target=".bs-docs-sidebar"{% endblock %}
+{% block content %}
+
+<div class="container">
+
+    <!-- Docs nav
+    ================================================== -->
+    <div class="row">
+        <div class="span3 bs-docs-sidebar">
+            <ul class="nav nav-list bs-docs-sidenav">
+                <li><a href="#work"><i class="icon-chevron-right"></i> How GSBurnCals Works</a></li>
+                <li><a href="#points"><i class="icon-chevron-right"></i> Points</a></li>
+                <li><a href="#input"><i class="icon-chevron-right"></i> Input Activity</a></li>
+                <li><a href="#status"><i class="icon-chevron-right"></i> Status</a></li>
+                <li><a href="#game"><i class="icon-chevron-right"></i> Game</a></li>
+                <li><a href="#privacy"><i class="icon-chevron-right"></i> Privacy</a></li>
+            </ul>
+        </div>
+        <div class="span9">
+            <!-- Global Bootstrap settings
+            ================================================== -->
+            <section id="work">
+            <div class="page-header">
+                <h1>How GSBurnCals Works</h1>
+            </div>
+            <p> Exercise, burn calories, and you raise your <i>Fuelscore</i>!  Input your <i>FuelBand</i> data to earn <i>points</i> and gain <i>status</i>.  Use your points to play the game, tip the scale, and win <i>rewards</i>! </p>
+            </section>
+            <hr>
+
+            <section id="points">
+            <div class="page-header">
+                <h1>Points</h1>
+            </div>
+            <h3>How do I earn points?</h3>
+            <p> When you input your FuelScore, you earn points for your physical activity, as well as a <i>daily input bonus</i>.  The points you earn from your fuel score are calculated as follows:</p>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th> FuelScore Credits </th>
+                        <th> Points </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td> First 2000 FuelScore </td>
+                        <td> 1pt/100 FuelScore </td>
+                    </tr>
+                    <tr>
+                        <td> 2001st-3000th FuelScore </td>
+                        <td> 1pt/50 FuelScore </td>
+                    </tr>
+                    <tr>
+                        <td> 3001th+ FuelScore </td>
+                        <td> 1pt/25 FuelScore </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p> For example, if today&#39;s FuelScore is 2500, you will earn 20 points for your first 2000 FuelScore, and 10 points for your next 500, for a total of 30 points.</p>
+            <p> Each day that you input your FuelScore, you receive a <a href="#input">daily input bonus</a>, which varies in value according to your <a href="#status">status</a>. </p>
+
+            <h3>How do I earn points?</h3>
+            <p> Use your points to play the <a href="#game"> game</a> and earn prizes! </p>
+
+            </section>
+            <hr>
+            <section id="input">
+            <div class="page-header">
+                <h1>Input Activity</h1>
+            </div>
+            <h3>Where do I find my daily steps, calorie, and FuelScore count?</h3>
+            <p>Every day, insert your FuelBand into the USB port of your computer and connect to the Internet. The first time you connect your FuelBand, follow the instructions on the box to set up your account. From then on, your data will upload automatically to NikePlus.com.</p>
+            <p>On NikePlus.com, you can view your daily activity.  Manually input the data for each day at GSBurnCals.stanford.edu so that you can earn points and win prizes!</p>
+
+            <h3>When can I input daily activity?</h3>
+            <p>You can input each day&#39;s activity any time after 12:00am on the next day.</p>
+
+            <h3>How many times can I input data each day?</h3>
+            <p>There is no limit on the number of dates for which you can enter data each day, but you can only input data once for each date. For example, on Feb 20th, you can input data for Feb 17th, 18th, and 19th, but you can only input data for Feb 17th once.  </p>
+
+            <h3>How do I earn an input bonus?</h3>
+            <p>Each day, you can earn up to 50 points for inputting a previous day&#39;s data. You can only receive a daily input bonus once each day, so it is in your best interest to input the previous day&#39; data every day.  If you input data for Feb 17th, 18th, and 19th on Feb 20th, you will only earn one input bonus.</p>
+
+            <h3>How much is my input bonus?</h3>
+            <p>The value of your input bonus depends on your <a href="#status">status</a></p>
+            <table class="table table-striped">
+                <tr>
+                    <th> If your status is... </th>
+                    <th> Your input bonus will be... </th>
+                </tr>
+                <tr>
+                    <td> Bronze </td>
+                    <td> 10pts </td>
+                </tr>
+                <tr>
+                    <td> Silver </td>
+                    <td> 30pts </td>
+                </tr>
+                <tr>
+                    <td> Gold </td>
+                    <td> 50pts </td>
+                </tr>
+            </table>
+            </section>
+            <hr>
+
+            <section id="status">
+            <div class="page-header">
+                <h1>Status</h1>
+            </div>
+            <h3>How is my status computed?</h3>
+            <p>On any given day, your status is Bronze, Silver, or Gold, determined by your status score.  Your status score increases every time you input your FuelScore by the amount you input.  For example, when you input a FuelScore of 2500, your status score increases by 2500.  Your status is calculated as follows:</p>
+            <table class="table table-striped">
+                <tr>
+                    <th> If your status score is... </th>
+                    <th> Your status is... </th>
+                </tr>
+                <tr>
+                    <td> 0-2200 </td>
+                    <td> Bronze </td>
+                </tr>
+                <tr>
+                    <td> 2201-3000 </td>
+                    <td> Silver </td>
+                </tr>
+                <tr>
+                    <td> 3001+ </td>
+                    <td> Gold </td>
+                </tr>
+            </table>
+
+            <p>Every day, your status score will drop by an amount that varies according to your status that day. i</p>
+            <table class="table table-striped">
+                <tr>
+                    <th> If your status today is... </th>
+                    <th> Your status score will drop, <br>over the course of the day, by... </th>
+                </tr>
+                <tr>
+                    <td> Bronze </td>
+                    <td> 2200 </td>
+                </tr>
+                <tr>
+                    <td> Silver </td>
+                    <td> 2600 </td>
+                </tr>
+                <tr>
+                    <td> Gold </td>
+                    <td> 3000 </td>
+                </tr>
+            </table>
+            <p>You status score will never drop below 0 or rise above 5000.</p>
+            </section>
+            <hr>
+
+            <section id="game">
+            <div class="page-header">
+                <h1>Game</h1>
+            </div>
+            <h3>What are the scales?</h3>
+            <p>You can choose to play any of the three scales on the game board.  The right side of each scale is weighed down by an unknown amount of cash, ranging from $0-$100.  Players add points to the scale to weigh down the left side.  Each point is equivalent to 5 cents.  Once the dollar equivalent of the points on the left side of the scale equals the cash value on the right side of the scale, the scale tips and the player who added the last point wins all of the cash.  Once a scale has tipped, a new one replaces it and the game starts over.</p>
+
+            <h3>How much cash is likely to be on the right side of the scale?</h3>
+            <p>The probability that the amount of cash on the right side of the scale is any given amount is uniform between $0 and $20.  So a $10 prize is just as likely to occur as a $1 prize.  Over the course of the quarter, a few prizes between $20 and $100 will be given out.</p>
+
+            <h3>When do I get my prizes?</h3>
+            <p>At the end of the quarter, you can cash out your rewards with Coupa Cafe Card.</p>
+
+            </section>
+
+            <hr>
+            <section id="privacy">
+            <div class="Privacy">
+                <h1>Privacy</h1>
+            </div>
+            <h3>Who can see my data?</h3>
+            <p>Only you, the SCSN staff, and your friends on the website can see the data you upload.  Your data will be used for statistical analysis to report general trends, but no individually identifiable data will be shared.</p>
+            </section>
+
+            {% endblock %}}
