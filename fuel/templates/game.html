@@ -4,8 +4,12 @@
 <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $("#won-modal").modal();
-        });
+            {% if won %}
+            $("#won-modal").modal();
+            {% elif not_enough_points %}
+            $("#not-enough-modal").modal();
+            {% endif %}
+            });
 </script>
 {% endblock %}
 {% block content %}
@@ -15,25 +19,35 @@
         <div class="well">
             <div style="position: relative;">
                 <img src="/static/img/scale_tilt.jpg">
-                <div style="position:absolute;top:42px;left:48px;width:40px">
+                <div style="position:absolute;top:42px;left:47px;width:40px">
                     <p> <center> <b> {{ scale.current_value }} points </b> </center></p>
                 </div>
                 <div style="position:absolute;top:78px;left:170px;">
                     <img src="/static/img/prize.png" height="48" width="38">
                 </div>
             </div>
-            <form method="POST" action="/action/addscale/{{ scale.id }}/10/">
-                {% csrf_token %}
-                <button id="add10" name="add10" class="btn btn-success btn-small" style="margin: 2px;">Add 10 pts</button>
-            </form>
-            <form method="POST" action="/action/addscale/{{ scale.id }}/50/">
-                {% csrf_token %}
-                <button id="add50" name="add50" class="btn btn-info btn-small" style="margin: 2px;">Add 50 pts</button>  
-            </form>
-            <form method="POST" action="/action/addscale/{{ scale.id }}/100/">
-                {% csrf_token %}
-                <button id="add100" name="add100" class="btn btn-primary btn-small" style="margin: 2px;">Add 100 pts</button>  
-            </form>
+            <div class="container-fluid" style="padding:10px 0 0 0">
+                <div class="row-fluid">
+                    <div class="span4">
+                        <form class="scale-buttons" method="POST" action="/action/addscale/{{ scale.id }}/10/">
+                            {% csrf_token %}
+                            <button id="add10" name="add10" class="btn btn-success btn-small btn-block">Add <span class="big">10</span> points</button>
+                        </form>
+                    </div>
+                    <div class="span4">
+                        <form class="scale-buttons" method="POST" action="/action/addscale/{{ scale.id }}/50/">
+                            {% csrf_token %}
+                            <button id="add50" name="add50" class="btn btn-info btn-small btn-block">Add <span class="big">50</span> points</button>
+                        </form>
+                    </div>
+                    <div class="span4">
+                        <form class="scale-buttons" method="POST" action="/action/addscale/{{ scale.id }}/100/">
+                            {% csrf_token %}
+                            <button id="add100" name="add100" class="btn btn-warning btn-small btn-block">Add <span class="big">100</span> points</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     {% endfor %}
@@ -68,6 +82,48 @@
     </div> <!-- span12 -->
 </div> <!-- row -->
 <div class="modal hide fade" id="won-modal">
-    hi
+    <div class="modal-header"><h3>Congratulations!</h3></div>
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span6">
+                    <img src="/static/img/scale_even.jpg" style="width:100%">
+                    <div style="position:absolute;top:58px;left:65px;width:40px;">
+                        <p> <center> <b> {{ won.target }} points </b> </center></p>
+                    </div>
+                    <div style="position:absolute;top:65px;left:192px;">
+                        <img src="/static/img/prize.png" height="42" width="32">
+                    </div>
+                </div>
+                <div class="span6">
+                    <div class="container-fluid">
+                        <div class="row-fluid">
+                            <div class="span12">
+                                <h2>You won</h2>
+                            </div>
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span12">
+                                <h2>${{ won.money }}</h2>
+                                {{ total_spent }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+<div class="modal hide fade" id="not-enough-modal">
+    <div class="modal-header"><h3>Sorry!</h3></div>
+    <div class="modal-body">
+        You do not have sufficient points to put on this scale!
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
 </div>
 {% endblock %}}

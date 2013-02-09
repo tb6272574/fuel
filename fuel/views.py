@@ -237,9 +237,10 @@ def game(request):
         cookies_to_delete.append(GAME_NOT_ENOUGH_POINTS)
 
     if GAME_WON in request.COOKIES:
-        c.update({GAME_WON: True, GAME_MONEY: float(request.COOKIES[GAME_MONEY])})
+        s = Scale.objects.get(id=int(request.COOKIES[GAME_WON])) 
+        total_spent = sum([x.amount for x in s.amount_set.filter(user=request.user)])
+        c.update({GAME_WON:s, 'total_spent': -1*total_spent})
         cookies_to_delete.append(GAME_WON)
-        cookies_to_delete.append(GAME_MONEY)
 
     if GAME_SPEND in request.COOKIES:
         c.update({GAME_SPEND: int(request.COOKIES[GAME_SPEND])})
@@ -272,8 +273,8 @@ def addscale(request, scaleid, amount):
     else:
         spent_amount = scale.add_amount(amount, request.user)
         if not scale.active:
-            response.set_cookie(key=GAME_WON, value=True, max_age=60)
-            response.set_cookie(key=GAME_MONEY, value=scale.money, max_age=60)
+            response.set_cookie(key=GAME_WON, value=scale.id, max_age=60)
+        
         response.set_cookie(key=GAME_SPEND, value=spent_amount, max_age=60)
 
     return response
