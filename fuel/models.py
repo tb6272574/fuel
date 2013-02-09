@@ -252,7 +252,7 @@ class Record(models.Model):
         a = 0
         f = self.fuelscore
         for l,v in zip(POINT_LIMITS, POINT_VALUES):
-            a = a + ceil(min(f, l) / v)
+            a = a + ceil(min(f, l) / float(v))
             if f <= l:
                 break
             else:
