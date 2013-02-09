@@ -75,8 +75,12 @@
         var yesterday = new Date();
         yesterday.setTime(yesterday.getTime() - (1000*3600*32)); //24+8 (UTC -8)    
         $("#date").val(yesterday.toJSON().substring(0,10));
-
-        $("td.day-available").last().click();
+        
+        if ($("td.day-available").length > 0) {
+            $("td.day-available").last().click();
+        } else if ($("td.day-done").length > 0) {
+            $("td.day-done").last().click();
+        }
 
         {% if invalid_date or invalid_input or repeated_input or record_added %}
         $("#modal").modal();

@@ -106,13 +106,15 @@ def addrecord(request):
         return response
 
     # add daily bonus if appropriate
-    t = Record.objects.filter(user=request.user)
+    t = Amount.objects.filter(user=request.user, atype=2)
     tz = pytz.timezone('America/Los_Angeles')
     bonus = True
     for r in t:
-        r_month = r.amount.time.astimezone(tz).month
-        r_day = r.amount.time.astimezone(tz).day
-        if r_month == month and r_day == day:
+        print r.time.astimezone(tz)
+
+        r_month = r.time.astimezone(tz).month
+        r_day = r.time.astimezone(tz).day
+        if r_month == today.month and r_day == today.day:
             bonus = False
     
     if bonus:
