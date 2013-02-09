@@ -55,8 +55,6 @@ input.input-styled {
 }
 
 div.calendar-form {
-    margin-top: 3px;
-    border-left: 1px solid #c0c0c0;
 }
 
 table.calendar td.day {

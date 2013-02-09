@@ -116,6 +116,8 @@ class FuelUser(User):
         a.time = pytz.utc.localize(datetime.datetime.utcnow())
         a.save()
 
+        return a.amount
+
     def current_amount(self):     
         return sum([a.amount for a in Amount.objects.filter(user=self)])
 
@@ -143,6 +145,7 @@ class FuelUser(User):
     def update_status(self):
         status = 'b'
         p = self.get_profile()
+        old_status = p.status
         for s in ['b', 's', 'g']:
             if p.status_value >= STATUS_LIMITS[s]:
                 status = s
@@ -159,9 +162,11 @@ class FuelUser(User):
                         )
             p.status = status
             p.save()
+        return (old_status, status)
 
     def add_status_fuelscore(self, fuelscore):
         p = self.get_profile()
+        ov = p.status_value
         nv = p.status_value + fuelscore
         if nv > STATUS_LIMITS['cap']:
             nv = STATUS_LIMITS['cap']
@@ -171,7 +176,7 @@ class FuelUser(User):
                     (
                         datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
                         self.email,
-                        p.status_value,
+                        ov,
                         fuelscore,
                         nv
                         )
@@ -179,7 +184,9 @@ class FuelUser(User):
 
         p.status_value = nv
         p.save()
-        self.update_status()
+        old_status, new_status = self.update_status()
+
+        return nv-ov
 
     class Meta:
         ordering = ['id']

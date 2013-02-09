@@ -16,6 +16,13 @@ GAME_ALREADY_FINISHED = 'already_finished'
 GAME_WON = 'won'
 GAME_MONEY = 'money'
 GAME_SPEND = 'spend'
+HOME_INVALID_DATE = 'invalid_date'
+HOME_FUTURE_DATE = 'future_date'
+HOME_REPEATED_INPUT = 'repeated_input'
+HOME_INVALID_INPUT = 'missing_input'
+HOME_RECORD_ADDED = 'record_added'
+HOME_STATUS_VALUE = 'status_value'
+HOME_DAILY_BONUS = 'daily_bonus'
 
 def index(request):
     if request.user.is_anonymous():
@@ -63,51 +70,69 @@ def login(request):
     else:
         return render_index(request, login_fail=True)
 
-#add record
 def addrecord(request):
-    #print request.GET['calories']
-    #t = loader.get_template('home.html')
-    #if (not request.GET['step'].isdigit()):
-    #    print 'bad step'
-    #    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'submit_fail': True, 'submit_fail_msg': 'Step should be a non-negative integer'})
-    #    return HttpResponse(t.render(c))
-    #if (not request.GET['calories'].isdigit()):              
-    #    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'submit_fail': True, 'submit_fail_msg': 'Calories should be a non-negative integer'})
-    #    return HttpResponse(t.render(c))
-    #if (not request.GET['fuel_score'].isdigit()):          
-    #    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'submit_fail': True, 'submit_fail_msg': 'fuel_score should be a non-negative integer'})
-    #    return HttpResponse(t.render(c))
-    year, month, day = request.GET['date'].split('-')
-    #if ((not year.isdigit()) or (not month.isdigit()) or (not day.isdigit())):
-    #    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'submit_fail': True, 'submit_fail_msg': 'Date format not right'})
-    #    return HttpResponse(t.render(c))
-    try:
-        t=Record.objects.filter(date=datetime.date(int(year),int(month),int(day))).get(user=request.user)
-        t.amount.delete()
-        t.delete()
-    except ObjectDoesNotExist:
-        print 'No clash'
-    t = Record(user=request.user)
-    t.date = datetime.date(int(year), int(month), int(day))
-    # the following three all need to be ints not strings
-    t.steps = int(request.GET['step'])
-    t.calories = int(request.GET['calories'])
-    t.fuelscore = int(request.GET['fuel_score'])
-    # then this will work
-    t.save_amount()
-    request.user.get_profile().get_fueluser().add_status_fuelscore(t.fuelscore)
+    if request.method == 'GET':
+        return HttpResponseForbidden('')
 
-    tz=pytz.timezone('America/Los_Angeles')
-    today = datetime.datetime.now()
-    #today = tz.localize(today)
-    today = today.date()
-    for t in Amount.objects.all():#.filter(atype=2).filter(user=request.user):
-        print t.time.astimezone(tz)
-        print today
-        if (t.time.astimezone(tz).date() == today) and (t.atype==2) and (t.user == request.user):
-            return HttpResponse('ok')
-    FuelUser.objects.get(id=request.user.id).add_daily_bonus()
-    return HttpResponse('ok')
+    response = HttpResponseRedirect(reverse('home'))
+
+    month = int(request.POST['month'])
+    day = int(request.POST['day'])
+    steps = int(request.POST['steps'])
+    calories = int(request.POST['calories'])
+    fuelscore = int(request.POST['fuelscore'])
+
+    # invalid date
+    if month not in [2,3] or day <= 0:
+        response.set_cookie(key=HOME_INVALID_DATE, value='%s/%s/2013' % (month, day), max_age=60)
+        return resposne
+    today = datetime.date.today()
+    if month > today.month or month == today.month and day >= today.day:
+        response.set_cookie(key=HOME_FUTURE_DATE, value='%s/%s/2013' % (month, day), max_age=60)
+        return response
+
+    # repeated input
+    t = Record.objects.filter(user=request.user, date=datetime.date(2013, month, day))
+    if len(t) > 0:
+        response.set_cookie(key=HOME_REPEATED_INPUT, value=t[0].id, max_age=60)
+        return response
+
+    # invalid input
+    if steps < 0 or calories < 0 or fuelscore < 0:
+        response.set_cookie(key=HOME_INVALID_INPUT, value=True, max_age=60)
+        return response
+    if steps > 50000 or calories > 10000 or fuelscore > 20000:
+        response.set_cookie(key=HOME_INVALID_INPUT, value=True, max_age=60)
+        return response
+
+    # add daily bonus if appropriate
+    t = Record.objects.filter(user=request.user)
+    tz = pytz.timezone('America/Los_Angeles')
+    bonus = True
+    for r in t:
+        r_month = r.amount.time.astimezone(tz).month
+        r_day = r.amount.time.astimezone(tz).day
+        if r_month == month and r_day == day:
+            bonus = False
+    
+    if bonus:
+        bonus_amount = FuelUser.objects.get(id=request.user.id).add_daily_bonus()
+        response.set_cookie(key=HOME_DAILY_BONUS, value=bonus_amount, max_age=60)
+
+
+    # construct record
+    t = Record(user=request.user)
+    t.date = datetime.date(2013, month, day)
+    t.steps = steps
+    t.calories = calories
+    t.fuelscore = fuelscore
+    t.save_amount()
+    status_value = request.user.get_profile().get_fueluser().add_status_fuelscore(fuelscore)
+
+    response.set_cookie(key=HOME_RECORD_ADDED, value=t.id, max_age=60)
+    response.set_cookie(key=HOME_STATUS_VALUE, value=status_value, max_age=60)
+    return response
+
 
 # requires logged in
 def home(request):
@@ -134,12 +159,37 @@ def home(request):
 
     calendar = [days[(i-1)*7:i*7] for i in range(1,int(math.ceil(len(days)/7)+1))]
 
-    print calendar
-
     t = loader.get_template('home.html')
     c = RequestContext(request, {'website_name': WEBSITE_NAME, 'calendar': calendar})
 
-    return HttpResponse(t.render(c))  
+    cookies_to_delete = []
+    if HOME_INVALID_DATE in request.COOKIES:
+        c.update({HOME_INVALID_DATE: request.COOKIES[HOME_INVALID_DATE]})
+        cookies_to_delete.append(HOME_INVALID_DATE)
+
+    if HOME_INVALID_INPUT in request.COOKIES:
+        c.update({HOME_INVALID_INPUT: request.COOKIES[HOME_INVALID_INPUT]})
+        cookies_to_delete.append(HOME_INVALID_INPUT)
+
+    if HOME_REPEATED_INPUT in request.COOKIES:
+        c.update({HOME_REPEATED_INPUT: Record.objects.get(id=int(request.COOKIES[HOME_REPEATED_INPUT]))})
+        cookies_to_delete.append(HOME_REPEATED_INPUT)
+
+    if HOME_RECORD_ADDED in request.COOKIES:
+        c.update({HOME_RECORD_ADDED: Record.objects.get(id=int(request.COOKIES[HOME_RECORD_ADDED]))})
+        cookies_to_delete.append(HOME_RECORD_ADDED)
+
+    if HOME_DAILY_BONUS in request.COOKIES:
+        c.update({HOME_DAILY_BONUS: int(request.COOKIES[HOME_DAILY_BONUS])})
+        cookies_to_delete.append(HOME_DAILY_BONUS)
+
+    if HOME_STATUS_VALUE in request.COOKIES:
+        c.update({HOME_STATUS_VALUE: float(request.COOKIES[HOME_STATUS_VALUE])})
+        cookies_to_delete.append(HOME_STATUS_VALUE)
+
+    response = HttpResponse(t.render(c))
+    [response.delete_cookie(x) for x in cookies_to_delete]
+    return response  
 
 def stats(request):
     if not request.user.is_authenticated():

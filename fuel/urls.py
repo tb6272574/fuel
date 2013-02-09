@@ -13,11 +13,11 @@ urlpatterns = patterns('',
     url(r'^game/$', 'fuel.views.game', name='game'),
     url(r'^login/$', 'fuel.views.login', name='login'),
     url(r'^logout/$', 'fuel.views.logout', name='logout'),
-    url(r'^addrecord/', 'fuel.views.addrecord', name='addrecord'),
     url(r'^stats/$', 'fuel.views.stats', name='stats'),
     url(r'^settings/$', 'fuel.views.settings', name='settings'),
 
     # actions
+    url(r'^action/addrecord/', 'fuel.views.addrecord', name='addrecord'),
     url(r'^action/addscale/(?P<scaleid>\d+)/(?P<amount>\d+)/$', 'fuel.views.addscale', name='addscale'),
     # url(r'^gsburn/', include('gsburn.foo.urls')),
 

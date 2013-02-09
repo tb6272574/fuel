@@ -2,6 +2,8 @@
 {% block title %}home{% endblock %}
 {% block head %}
 <script type="text/javascript">
+    month = 0;
+    day = 0;
     $(document).ready(function() {
         $("td.day-done").click(function() {
             $("td.day").css('font-weight', 'normal').css('background-color', '');
@@ -15,8 +17,8 @@
             $("input#steps").val(steps).prop('disabled', true);
             $("input#calories").val(calories).prop('disabled', true);
             $("input#fuelscore").val(fuelscore).prop('disabled', true);
-            $("#form-available-submit").hide();
-    });
+            $("#form-available-submit").prop('disabled', true);
+        });
 
         $("td.day-available").click(function() {
             $("td.day").css('font-weight', 'normal').css('background-color', '');
@@ -24,10 +26,12 @@
             month = $(this).attr('id').split('-')[1];
             day = $(this).attr('id').split('-')[2];
             $("span#calendar-date").html(month+"/"+day+"/2013");
+            $("input#month").val(month);
+            $("input#day").val(day);
             $("input#steps").val('').prop('disabled', false);
             $("input#calories").val('').prop('disabled', false);
             $("input#fuelscore").val('').prop('disabled', false);
-            $("#form-available-submit").show();
+            $("#form-available-submit").prop('disabled', false);
             $("input#steps").focus();
         });
 
@@ -73,6 +77,10 @@
         $("#date").val(yesterday.toJSON().substring(0,10));
 
         $("td.day-available").last().click();
+
+        {% if invalid_date or invalid_input or repeated_input or record_added %}
+        $("#modal").modal();
+        {% endif %}
     });
 </script>
 {% endblock %}
@@ -96,9 +104,9 @@
             </div>
         </div>
         <div class="well" style="position: relative; top: -5px; z-index: -100">
-                {% for friend in user.profile.get_fueluser.friends %}
-                <li>{{ friend.get_full_name }}</li>
-                {% endfor %}
+            {% for friend in user.profile.get_fueluser.friends %}
+            <li>{{ friend.get_full_name }}</li>
+            {% endfor %}
         </div>
     </div>
     <div class="span8">
@@ -138,12 +146,10 @@
                             {% for week in calendar %}
                             <tr>
                                 {% for day in week %}
-                                {% comment %}done{% endcomment %}
                                 {% if day.1 %}
                                 <td class="day day-done" id="day-{{ day.0.month }}-{{ day.0.day }}-{{ day.3.steps }}-{{ day.3.calories }}-{{ day.3.fuelscore }}">
                                     {{ day.0.day }}
                                 </td>
-                                {% comment %}done{% endcomment %}
                                 {% elif day.2 %}
                                 <td class="day day-future">
                                     {{ day.0.day }}
@@ -159,50 +165,133 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="span8 calendar-form" id="form-available">
-                    <div class="container-fluid">
-                        <div class="row-fluid">
-                            <div class="span12">
-                    <p><b>Your data for <span id="calendar-date" class="label label-inverse">2/14/2013</span>:</b></p>
+                <div class="span8 calendar-form">
+                    <form method="post" action="{% url addrecord %}">
+                        {% csrf_token %}
+                        <div class="container-fluid well">
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    <p><b>Your data for <span id="calendar-date" class="label label-inverse">2/14/2013</span>:</b></p>
+                                    <input type="hidden" id="month" name="month">
+                                    <input type="hidden" id="day" name="day">
+                                </div>
+                            </div>
+                            <div class="row-fluid" style="text-align:center">
+                                <div class="span4">
+                                    <div class="navbar-inner small">Steps</div>
+                                    <input type="text" class="input-block-level input-large-font input-styled" name="steps" id="steps">
+                                </div>
+                                <div class="span4">
+                                    <div class="navbar-inner small">Calories</div>
+                                    <input type="text" class="input-block-level input-large-font input-styled" name="calories" id="calories">
+                                </div>
+                                <div class="span4">
+                                    <div class="navbar-inner small">FuelScore</div>
+                                    <input type="text" class="input-block-level input-large-font input-styled" name="fuelscore" id="fuelscore">
+                                </div>
+
+                            </div>
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    <button class="btn btn-block btn-primary btn-large" id="form-available-submit">Submit</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="row-fluid" style="text-align:center">
-                            <div class="span4">
-                                <div class="navbar-inner small">Steps</div>
-                                <input type="text" class="input-block-level input-large-font input-styled" name="steps" id="steps">
-                            </div>
-                            <div class="span4">
-                                <div class="navbar-inner small">Calories</div>
-                                <input type="text" class="input-block-level input-large-font input-styled" name="calories" id="calories">
-                            </div>
-                            <div class="span4">
-                                <div class="navbar-inner small">FuelScore</div>
-                                <input type="text" class="input-block-level input-large-font input-styled" name="fuelscore" id="fuelscore">
-                            </div>
-                            
-                        </div>
-                        <div class="row-fluid">
-                            <div class="span12">
-                                <button class="btn btn-block btn-primary btn-large" id="form-available-submit">Submit</button>
-                            </div>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
             <hr style="border-bottom: 5px dotted #c0c0c0">
-
-<!--            <div class="row-fluid">
-                <input class="input span4" type="text" id="step" name="step" placeholder="Steps" value="{{ step }}">
-            </div>
-            <div class="row-fluid">
-                <input class="input span4" type="text" id="calories" name="calories" placeholder="Calorie" value="{{ calorie }}"> 
-            </div>
-            <div class="row-fluid">
-                <input class="input span4" type="text" id="fuel_score" name="fuel_score" placeholder="FuelScore" value="{{ fuel_score }}">                                           
-            </div>
-            <input class="input span4" type="date" id="date" name="date" placeholder="date">
-            <button id="submit-button" name="submit-button" type="submit span2" class="btn btn-success btn-primary" style="float:right">Submit</button>    -->                      
         </div> <!-- container-fluid -->
     </div> <!-- span8 -->
 </div> <!-- row -->
-{% endblock %}}
+
+<! -- modals -->
+{% if invalid_date %}
+<div class="modal hide fade" id="modal">
+    <div class="modal-header"><h3>Invalid date submitted</h3></div>
+    <div class="modal-body">
+        The date you have chosen ({{ invalid_date }}) is invalid. Please check your input and try again.
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+{% elif invalid_input %}
+<div class="modal hide fade" id="modal">
+    <div class="modal-header"><h3>Invalid data submitted</h3></div>
+    <div class="modal-body">
+        Your submission is invalid. Please check your input and try again.
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+{% elif repeated_input %}
+<div class="modal hide fade" id="modal">
+    <div class="modal-header"><h3>Repeated data submitted</h3></div>
+    <div class="modal-body">
+        You have already submitted a report for this day ({{ repeated_input.date }}). Please check your input and try again.
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+{% elif record_added %}
+<div class="modal hide fade" id="modal">
+    <div class="modal-header"><h3>Activity submitted for {{ record_added.date }}!</h3></div>
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span12">
+                    {% if daily_bonus %}
+                    <p><b>Congratulations on earning {{ record_added.amount.amount|add:daily_bonus }} points!</b></p>
+                    {% else %}
+                    <p><b>Congratulations on earning {{ record_added.amount.amount }} points!</b></p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    <table class="table table-condensed">
+                        <tbody>
+                            <tr>
+                                <td><b>Steps</b></td>
+                                <td>{{ record_added.steps }}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Calories</b></td>
+                                <td>{{ record_added.calories }}</td>
+                            </tr>
+                            <tr>
+                                <td><b>FuelScore</b></td>
+                                <td>{{ record_added.fuelscore }}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Points earned</b></td>
+                                <td>{{ record_added.amount.amount}}</td>
+                            </tr>
+                            {% if daily_bonus %}
+                            <tr>
+                                <td><b>Daily bonus</b></td>
+                                <td>{{ daily_bonus }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td><b>Status points</b></td>
+                                <td>{{ status_value }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="span6">
+                    <img src="/static/img/fuelband.jpg" style="width:100%">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
