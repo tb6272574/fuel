@@ -153,3 +153,7 @@ button span.big {
 form.scale-buttons {
     margin-bottom: 0;
 }
+
+small {
+    font-size: 8pt;
+}
