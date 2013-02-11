@@ -196,23 +196,28 @@ def home(request):
 def stats(request):
     if not request.user.is_authenticated():
         return HttpResponseForbidden()
-    fuelscore = '{name:\"FuelScore\", values:['
-    steps = '{name:\"Steps\", values:[' 
-    calories = '{name:\"Calories\", values:[' 
-    points = '{name:\"Points\", values:[' 
+    #fuelscore = '{name:\"FuelScore\", values:['
+    #steps = '{name:\"Steps\", values:[' 
+    #calories = '{name:\"Calories\", values:[' 
+    #points = '{name:\"Points\", values:[' 
+    fuelscore = '['
+    steps = '['
+    calories = '['
+    points = '['
     for t in request.user.record_set.all():
         fuelscore = fuelscore + str(t.fuelscore) + ','
         steps = steps + str(t.steps) + ','
         calories = calories + str(t.calories) + ','
         points = points + str(t.get_amount()) + ','
-    fuelscore = fuelscore + ']},'
-    steps = steps + ']},'
-    calories = calories + ']},'
-    points = points + ']},'
-    userdata = '[' + fuelscore + steps + calories + points + ']'
+    fuelscore = fuelscore + ']'
+    steps = steps + ']'
+    calories = calories + ']'
+    points = points + ']'
+    #userdata = '[' + fuelscore + steps + calories + points + ']'
+    userdata = fuelscore;
     print userdata
     t = loader.get_template('stats.html')
-    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'userdata': userdata})
+    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'fuelscore':fuelscore, 'steps':steps,'calories':calories,'points':points})
     return HttpResponse(t.render(c))
 
 # requires logged in
