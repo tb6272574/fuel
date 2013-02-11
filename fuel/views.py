@@ -299,7 +299,7 @@ def history(request):
     c = RequestContext(request, {'website_name': WEBSITE_NAME})
     # page the activities
     aset = request.user.amount_set.all()
-    chunk_size = 10
+    chunk_size = 15
     c.update({
         'amounts_paged': [aset[i*chunk_size:(i+1)*chunk_size] for i in range(int(math.ceil(len(aset)/float(chunk_size))))]
         })
