@@ -6,76 +6,57 @@
 <link href="/static/css/style.css" rel="stylesheet" type="text/css" />
 
 </head>
-
+<h2> FuelScore </h2>
 <script type="text/javascript+protovis">
+var data = {{ fuelscore }},
+    w = 800,
+    h = 400,
+    x = pv.Scale.ordinal(pv.range(data.length)).splitBanded(0, w, 2/5);
+var maxdata = 0;
+    for (var point in data)
+    {
+      if (data[point] > maxdata)
+        maxdata=data[point];
+    }
+    y = pv.Scale.linear(0, maxdata*1.1).range(0, h);
 
-{% autoescape off %}
-var userdata = {{ userdata }}
-{% endautoescape %}
-
-var w = 800,
-    h = 150,
-    numberFormat = pv.Format.number(),
-    dateFormat = pv.Format.date("%B %Y");
-
-/* Color by maximum number of people employed in that job. */
-var c = pv.Scale.log(userdata, function(d) pv.max(d.values))
-    .range("#ccc", "#1f77b4");
-
-/* Tile the visualization for each job. */
 var vis = new pv.Panel()
-    .data(userdata)
     .width(w)
-    .height(h + 10)
-    .top(6)
-    .left(6)
-    .right(6)
-    .bottom(6);
+    .height(h)
+    .bottom(20)
+    .left(35)
+    .right(5)
+    .top(5);
 
-/* A panel instance to store scales (x, y) and the mouseover index (i). */
-var panel = vis.add(pv.Panel)
-    .def("i", -1)
-    .def("x", function(d) pv.Scale.linear(d.values, pv.index).range(0, w))
-    .def("y", function(d) pv.Scale.linear(0, pv.max(d.values)).range(0, h))
-    .bottom(10)
-    .events("all")
-    .event("mousemove", pv.Behavior.point(Infinity).collapse("y"));
-
-/* The area. */
-panel.add(pv.Area)
-    .data(function(d) d.values)
-    .fillStyle(function(d, p) panel.i() < 0 ? c(pv.max(p.values)) : "#2ca02c")
-    .left(function() panel.x()(this.index))
-    .height(function(d) panel.y()(d))
+var bar = vis.add(pv.Bar)
+    .data(data)
+    .left(function() x(this.index))
+    .width(x.range().band)
     .bottom(0)
-    .event("point", function() panel.i(this.index))
-    .event("unpoint", function() panel.i(-1));
+    .height(y);
 
-/* The x-axis. */
-panel.add(pv.Rule)
-    .bottom(0);
+bar.anchor("top").add(pv.Label)
+    .textStyle("white")
+    .text(function(d) d.toFixed(0));
 
-/* The mouseover dot. */
-panel.add(pv.Dot)
-    .visible(function() panel.i() >= 0)
-    .left(function() panel.x()(panel.i()))
-    .bottom(function(d) panel.y()(d.values[panel.i()]))
-    .fillStyle("#ff7f0e")
-    .strokeStyle(null)
-    .size(10);
-
-/* The label: either the job name, or the month and value. */
-panel.add(pv.Label)
-    .bottom(-1)
+bar.anchor("bottom").add(pv.Label)
+    .textMargin(5)
     .textBaseline("top")
-    .left(function() panel.i() < 0 ? 0 : null)
-    .right(function() panel.i() < 0 ? null : 0)
-    .textAlign(function() panel.i() < 0 ? "left" : "right")
-    .textStyle(function() panel.i() < 0 ? "#999" : "#000")
-    .text(function(d) panel.i() < 0 ? d.name
-        : numberFormat(d.values[panel.i()]));
+    .text(function() "ABCDEFGHIJK".charAt(this.index));
+
+vis.add(pv.Rule)
+    .data(y.ticks())
+    .bottom(function(d) Math.round(y(d)) - .5)
+    .strokeStyle(function(d) d ? "rgba(255,255,255,.3)" : "#000")
+  .add(pv.Rule)
+    .left(0)
+    .width(5)
+    .strokeStyle("#000")
+  .anchor("left").add(pv.Label)
+    .text(function(d) d.toFixed(0));
 
 vis.render();
+
 
 </script>
 
