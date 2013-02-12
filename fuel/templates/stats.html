@@ -8,9 +8,11 @@
 </head>
 <h2> FuelScore </h2>
 <script type="text/javascript+protovis">
-var data = {{ fuelscore }},
-    w = 800,
-    h = 400,
+var //data = {{ fuelscore }},
+    data = [1200,1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000,800,300,1000,2000],
+    avgdata = [2000, 3000, 1000, 1000, 2330, 3000, 1000, 1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000,300,400,500,80],
+    w = 400,
+    h = 200,
     x = pv.Scale.ordinal(pv.range(data.length)).splitBanded(0, w, 2/5);
 var maxdata = 0;
     for (var point in data)
@@ -18,9 +20,16 @@ var maxdata = 0;
       if (data[point] > maxdata)
         maxdata=data[point];
     }
-    y = pv.Scale.linear(0, maxdata*1.1).range(0, h);
+    for (var point in avgdata)
+    {
+      if (avgdata[point] > maxdata)
+        maxdata=avgdata[point];
+    }
+ 
+    y = pv.Scale.linear(0, maxdata*1.3).range(0, h);
 
 var vis = new pv.Panel()
+    .def("i",-1)
     .width(w)
     .height(h)
     .bottom(20)
@@ -29,20 +38,33 @@ var vis = new pv.Panel()
     .top(5);
 
 var bar = vis.add(pv.Bar)
+    //.visible(false)
     .data(data)
     .left(function() x(this.index))
-    .width(x.range().band)
+    .width(w/data.length * 3 / 4)
     .bottom(0)
-    .height(y);
+    .height(y)
+    .fillStyle(function() (vis.i()==this.index)?"#1f77b4":"#aec7e8")
+    .event("mouseover", function() vis.i(this.index))
+    .event("mouseout", function() vis.i(-1))
 
-bar.anchor("top").add(pv.Label)
-    .textStyle("white")
-    .text(function(d) d.toFixed(0));
+
+bar.add(pv.Label)
+    .left(20)
+    .top(10)
+    .visible(function() vis.i() == this.index)
+    .textStyle("#000")
+    .text(function(d) 'Your FuelScore: ' + d.toFixed(0))
+    .font("bold 10pt san-serif")
+   .add(pv.Dot)
+     .left(15)
+     .top(3)
+     .size(15)
 
 bar.anchor("bottom").add(pv.Label)
     .textMargin(5)
     .textBaseline("top")
-    .text(function() "ABCDEFGHIJK".charAt(this.index));
+    .text(function() ((14 + this.index > 28)?14+this.index-28:14+this.index).toString())
 
 vis.add(pv.Rule)
     .data(y.ticks())
@@ -55,10 +77,133 @@ vis.add(pv.Rule)
   .anchor("left").add(pv.Label)
     .text(function(d) d.toFixed(0));
 
+var line = vis.add(pv.Line)
+    .data(avgdata)
+    .left(function() x(this.index) + w/data.length/3)
+    .bottom(y)
+    .strokeStyle("#98df8a")
+    .lineWidth(5);
+
+line.add(pv.Dot)
+    .fillStyle("#2ca02c")
+    .size(30)
+    .lineWidth(1)
+    .event("mouseover", function() vis.i(this.index))
+    .event("mouseout", function() vis.i(-1))
+   .add(pv.Dot)
+     .left(15)
+     .top(23)
+     .size(20)
+     .visible(function() vis.i() == this.index)
+
+
+    .add(pv.Label)
+    .top(30)
+    .left(20)
+    .text(function(d) 'Class Average FuelScore: ' + d.toFixed(0))
+    .textStyle("#000")
+    .font("bold 10pt san-serif")
+    .bottom(function() this.parent.index * 12 + 10)
+    .visible(function() vis.i() == this.index);
+    //.event(
+
 vis.render();
-
-
 </script>
+
+<h2>Steps</h2>
+<script type="text/javascript+protovis">
+var //data = {{ fuelscore }},
+    data = [2000, 3000, 1000, 1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000,800,300],
+    avgdata = [1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000, 3000, 1000, 1000, 4000, 500, 2000,300,400,500,800,900],
+    w = 400,
+    h = 200,
+    x = pv.Scale.ordinal(pv.range(data.length)).splitBanded(0, w, 2/5);
+var maxdata = 0;
+    for (var point in data)
+    {
+      if (data[point] > maxdata)
+        maxdata=data[point];
+    }
+    for (var point in avgdata)
+    {
+      if (avgdata[point] > maxdata)
+        maxdata=avgdata[point];
+    }
+ 
+    y = pv.Scale.linear(0, maxdata*1.3).range(0, h);
+
+var vis2 = new pv.Panel()
+    .def("i",-1)
+    .width(w)
+    .height(h)
+    .bottom(20)
+    .left(35)
+    .right(5)
+    .top(5);
+
+var bar = vis2.add(pv.Bar)
+    //.visible(false)
+    .data(data)
+    .left(function() x(this.index))
+    .width(w/data.length * 2 / 3)
+    .bottom(0)
+    .height(y)
+    .fillStyle(function() (vis2.i()==this.index)?"#1f77b4":"#aec7e8")
+    .event("mouseover", function() vis2.i(this.index))
+    .event("mouseout", function() vis2.i(-1))
+
+
+bar.add(pv.Label)
+    .left(20)
+    .top(10)
+    .visible(function() vis2.i() == this.index)
+    .textStyle("#000")
+    .text(function(d) 'Your Steps: ' + d.toFixed(0))
+    .font("bold 10pt san-serif")
+
+bar.anchor("bottom").add(pv.Label)
+    .textMargin(5)
+    .textBaseline("top")
+    .text(function() ((14 + this.index > 28)?14+this.index-28:14+this.index).toString())
+
+vis2.add(pv.Rule)
+    .data(y.ticks())
+    .bottom(function(d) Math.round(y(d)) - .5)
+    .strokeStyle(function(d) d ? "rgba(255,255,255,.3)" : "#000")
+  .add(pv.Rule)
+    .left(0)
+    .width(5)
+    .strokeStyle("#000")
+  .anchor("left").add(pv.Label)
+    .text(function(d) d.toFixed(0));
+
+var line = vis2.add(pv.Line)
+    .data(avgdata)
+    .left(function() x(this.index) + w/data.length/3)
+    .bottom(y)
+    .strokeStyle("#98df8a")
+    .lineWidth(5);
+
+line.add(pv.Dot)
+    .fillStyle("#2ca02c")
+    .size(30)
+    .lineWidth(1)
+    .event("mouseover", function() vis2.i(this.index))
+    .event("mouseout", function() vis2.i(-1))
+
+    .add(pv.Label)
+    .top(30)
+    .left(20)
+    .text(function(d) 'Class Average Steps: ' + d.toFixed(0))
+    .textStyle("#000")
+    .font("bold 10pt san-serif")
+    .bottom(function() this.parent.index * 12 + 10)
+    .visible(function() vis2.i() == this.index);
+    //.event(
+
+vis2.render();
+</script>
+
 
 
 {% endblock %}}
