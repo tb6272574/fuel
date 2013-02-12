@@ -104,12 +104,20 @@
 
         <div class="navbar" style="margin-bottom: 0">
             <div class="navbar-inner">
-                <span class="nav-title">Friends</span>
+                <span class="nav-title">Friends and you</span>
             </div>
         </div>
         <div class="well" style="position: relative; top: -5px; z-index: -100">
-            {% for friend in user.profile.get_fueluser.friends %}
-            <li>{{ friend.get_full_name }}</li>
+            {% for friend in friends %}
+            <div style="height: 52px">
+                <img class="face-picture" src="/static/img/student-pictures/{{ friend.image }}" style="margin-right: 5px">
+                <b>{{ friend.name }}</b>
+                {% autoescape off %}
+                {{ friend.badge }} 
+                {% endautoescape %}
+                <br>
+                <span title="Cumulative FuelScore uploaded since 2/14/2013">FuelScore</span>: {{ friend.cfs }}, ${{ friend.money|floatformat:2 }}
+            </div>
             {% endfor %}
         </div>
     </div>
@@ -126,7 +134,7 @@
                     <a class="btn btn-large btn-success btn-block" href="{% url stats %}">Statistics</a>
                 </div>
             </div>
-            <hr style="border-bottom: 5px dotted #c0c0c0">
+            <hr style="border-bottom: 5px dotted #e0e0e0">
             <div class="row-fluid">                             
                 <div class="span12">  
                     <h3> Input your activity </h3>
@@ -204,7 +212,7 @@
                     </form>
                 </div>
             </div>
-            <hr style="border-bottom: 5px dotted #c0c0c0">
+            <hr style="border-bottom: 5px dotted #e0e0e0">
         </div> <!-- container-fluid -->
     </div> <!-- span8 -->
 </div> <!-- row -->

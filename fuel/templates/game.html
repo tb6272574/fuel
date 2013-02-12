@@ -4,18 +4,25 @@
 <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-            {% if won %}
-            $("#won-modal").modal();
-            {% elif not_enough_points %}
-            $("#not-enough-modal").modal();
-            {% elif game_already_finished %}
-            $("#already-finished-modal").modal();
-            {% endif %}
-            });
+        {% if won %}
+        $("#won-modal").modal();
+        {% elif not_enough_points %}
+        $("#not-enough-modal").modal();
+        {% elif game_already_finished %}
+        $("#already-finished-modal").modal();
+        {% endif %}
+    });
 </script>
 {% endblock %}
 {% block content %}
 <div class="row">
+    <div class="span12">
+        <div class="nav">
+            <div class="navbar-inner">
+                <span class="nav-title">Your current balance: {{ user.profile.get_fueluser.current_amount }} point{{ user.profile.get_fueluser.current_amount|pluralize }}</span>
+            </div>
+        </div>
+    </div>
     {% for scale in active_scales %}
     <div class="span4">
         <div class="navbar-inner small">Scale {{ scale.id }}</div>
@@ -83,14 +90,14 @@
         <div class="container-fluid">
             <div class="row-fluid">
                 <div class="span12">
-                                You are the winner of this scale! You have won ${{ won.money|floatformat:2 }}. 
+                    You are the winner of this scale! You have won ${{ won.money|floatformat:2 }}. 
                 </div>
             </div>
             <div class="row-fluid">
-                 <div class="span6 scale" style="align:right">
+                <div class="span6 scale" style="align:right">
                     <img src="/static/img/scale_even.png" style="width:260px; max-width: 260px">
                     <div style="position:absolute;top:143px;left:72px;width:60px;line-height:9px">
-                    <center><big>{{ won.target }}</big><br><small>pts</small></center>
+                        <center><big>{{ won.target }}</big><br><small>pts</small></center>
                     </div>
                 </div>
                 <div class="span6">
@@ -111,7 +118,7 @@
                         </tbody>
                     </table>
                 </div>
-           </div>
+            </div>
         </div>
     </div>
     <div class="modal-footer">

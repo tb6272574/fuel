@@ -66,6 +66,8 @@ def login(request):
                     u.backend = 'django.contrib.auth.backends.ModelBackend'
                     auth.login(request, u)
                     return HttpResponseRedirect(reverse('home'))
+                else:
+                    return render_index(request, login_fail=True)
 
     else:
         return render_index(request, login_fail=True)
@@ -139,7 +141,7 @@ def addrecord(request):
 # requires logged in
 def home(request):
     if not request.user.is_authenticated():
-        return HttpResponseForbidden()
+        return HttpResponseRedirect(reverse('index'))
 
     # calendar
     days = []
@@ -189,8 +191,37 @@ def home(request):
         c.update({HOME_STATUS_VALUE: float(request.COOKIES[HOME_STATUS_VALUE])})
         cookies_to_delete.append(HOME_STATUS_VALUE)
 
+    # friends
+    me = request.user.profile.get_fueluser()
+    friends_output = [
+            {
+                'image': me.image_url(),
+                'name': me.get_full_name(),
+                'badge': me.status_badge(),
+                'cfs': sum([x.fuelscore for x in Record.objects.filter(user=request.user)]),
+                'money': me.winnings()
+                }
+            ]
+    for f in me.friends():
+        f_fueluser = f.profile.get_fueluser()
+        cfs = sum([x.fuelscore for x in Record.objects.filter(user=f)])
+        friend = {
+                'image': f_fueluser.image_url(),
+                'name': f_fueluser.get_full_name(),
+                'badge': f_fueluser.status_badge(),
+                'cfs': cfs,
+                'money': f_fueluser.winnings()
+                }
+        friends_output.append(friend)
+    s_finished = sorted(Scale.objects.filter(active=False), key=lambda scale: scale.get_end_time(), reverse=True)
+
+    friends_output = sorted(friends_output, key=lambda f: f['cfs'], reverse=True)
+    c.update({'friends': friends_output})
+    
+    # write response
     response = HttpResponse(t.render(c))
     [response.delete_cookie(x) for x in cookies_to_delete]
+
     return response  
 
 def stats(request):

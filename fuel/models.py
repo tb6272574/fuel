@@ -188,6 +188,19 @@ class FuelUser(User):
 
         return nv-ov
 
+    def status_badge(self):
+        badge_class = {
+                'b': 'important',
+                's': 'default',
+                'g': 'warning',
+                }
+        badge_name = {
+                'b': 'Bronze',
+                's': 'Silver',
+                'g': 'Gold'
+                }
+        return "<span class=\"badge badge-%s\">%s</span>" % (badge_class[self.get_profile().status], badge_name[self.get_profile().status])
+
     class Meta:
         ordering = ['id']
         proxy = True
