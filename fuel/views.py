@@ -118,7 +118,7 @@ def addrecord(request):
         r_day = r.time.astimezone(tz).day
         if r_month == today.month and r_day == today.day:
             bonus = False
-    
+
     if bonus:
         bonus_amount = FuelUser.objects.get(id=request.user.id).add_daily_bonus()
         response.set_cookie(key=HOME_DAILY_BONUS, value=bonus_amount, max_age=60)
@@ -235,35 +235,90 @@ def stats(request):
     steps = '['
     calories = '['
     points = '['
-    for t in request.user.record_set.all():
-        fuelscore = fuelscore + str(t.fuelscore) + ','
-        steps = steps + str(t.steps) + ','
-        calories = calories + str(t.calories) + ','
-        points = points + str(t.get_amount()) + ','
+    fuelscore_avg = '['
+    steps_avg = '['
+    calories_avg = '['
+    points_avg = '['
+    td = datetime.datetime.now().day
+    tm = datetime.datetime.now().month
+    bound = td;
+    if tm == 3:
+        bound = td + 28;
+    for d in range(7,bound):  #change to (14,40)
+        if d <= 28:
+            t=request.user.record_set.filter(date=datetime.date(2013,2,d))
+        else:
+            t=request.user.record_set.filter(date=datetime.date(2013,3,d-28))
+        if len(t)==0:
+            fuelscore = fuelscore + '0,'
+            steps = steps + '0,'
+            calories = calories + '0,'
+            points = points + '0,'
+        else:
+            fuelscore = fuelscore + str(t[0].fuelscore) + ','
+            steps = steps + str(t[0].steps) + ','
+            calories = calories + str(t[0].calories) + ','   
+            points = points + str(t[0].get_amount()) + ','  
+
+    for d in range(7,bound):
+        fs = 0
+        st = 0
+        cal = 0
+        pt = 0
+        tot = 0;
+        for user in User.objects.all():
+            if d <= 28:
+                t=user.record_set.filter(date=datetime.date(2013,2,d))
+            else:
+                t=user.record_set.filter(date=datetime.date(2013,3,d-28))
+            if len(t)>0:
+                fs = fs + t[0].fuelscore
+                st = st + t[0].steps
+                cal = cal + t[0].calories
+                pt = pt + t[0].get_amount()
+                tot = tot + 1;
+        if tot == 0:
+            tot = 1;
+        fs = float(fs) / tot
+        st = float(st) / tot
+        cal = float(cal) / tot
+        pt = float(pt) / tot
+        fuelscore_avg = fuelscore_avg + str(fs) + ','
+        steps_avg = steps_avg + str(st) + ','
+        calories_avg = calories_avg + str(cal) + ','
+        points_avg = points_avg + str(pt) + ','
+
     fuelscore = fuelscore + ']'
     steps = steps + ']'
     calories = calories + ']'
     points = points + ']'
-    #userdata = '[' + fuelscore + steps + calories + points + ']'
-    userdata = fuelscore;
-    print userdata
+    fuelscore_avg = fuelscore_avg + ']' 
+    steps_avg = steps_avg + ']'
+    calories_avg = calories_avg + ']'
+    points_avg = points_avg + ']'
     t = loader.get_template('stats.html')
-    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'fuelscore':fuelscore, 'steps':steps,'calories':calories,'points':points})
+    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'fuelscore':fuelscore, 'steps':steps,'calories':calories,'points':points, 'fuelscore_avg':fuelscore_avg, 'steps_avg':steps_avg, 'calories_avg':calories_avg,'points_avg':points_avg})
+    print 'fuelscore' + fuelscore
+    print 'fuelscore avg' + fuelscore_avg
+
+    print 'steps avg' + steps_avg
+    print 'points avg' + points_avg
+
     return HttpResponse(t.render(c))
 
 # requires logged in
 def game(request):
     if not request.user.is_authenticated():
         return HttpResponseForbidden()
-    
+
     t = loader.get_template('game.html')
     s_active = Scale.objects.filter(active=True)
     s_finished = sorted(Scale.objects.filter(active=False), key=lambda scale: scale.get_end_time(), reverse=True)
 
     c = RequestContext(request, {'website_name': WEBSITE_NAME, 'active_scales': s_active, 'finished_scales': s_finished})
-    
+
     cookies_to_delete = []
-    
+
     if GAME_ALREADY_FINISHED in request.COOKIES:
         c.update({GAME_ALREADY_FINISHED: True})
         cookies_to_delete.append(GAME_ALREADY_FINISHED)
@@ -289,7 +344,7 @@ def game(request):
 def addscale(request, scaleid, amount):
     if not request.user.is_authenticated():
         return HttpResponseForbidden()
-    
+
     amount = int(amount)
     scaleid = int(scaleid) 
     print 'scale id=' + str(scaleid) + ' amount=' + str(amount)
@@ -310,7 +365,7 @@ def addscale(request, scaleid, amount):
         spent_amount = scale.add_amount(amount, request.user)
         if not scale.active:
             response.set_cookie(key=GAME_WON, value=scale.id, max_age=60)
-        
+
         response.set_cookie(key=GAME_SPEND, value=spent_amount, max_age=60)
 
     return response
@@ -341,7 +396,7 @@ def settings(request):
     c = RequestContext(request, {'website_name': WEBSITE_NAME})
     if request.method == 'GET':
         return HttpResponse(t.render(c))
-    
+
     # change password
     action = request.POST['action']
     if action == 'update_password':
@@ -371,4 +426,4 @@ def settings(request):
 
     return HttpResponse(t.render(c))
 
-        
+
