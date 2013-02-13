@@ -5,6 +5,8 @@
     month = 0;
     day = 0;
     $(document).ready(function() {
+        $("div.status-meter").height({{ user.profile.status_value }}/20);
+
         $("td.day-done").click(function() {
             $("td.day").css('font-weight', 'normal').css('background-color', '');
             $(this).css('font-weight', 'bold').css('background-color', '#ffc');
@@ -101,7 +103,27 @@
             <span><span class="big-numbers">{{ user.profile.get_fueluser.current_amount }}</span> point{{ user.profile.get_fueluser.current_amount|pluralize }}</span>
             <span class="pull-right">$<span class="big-numbers">{{ user.profile.get_fueluser.winnings|floatformat:2 }}</span></span>
         </div>
-
+        <div class="navbar" style="margin-bottom: 0">
+            <div class="navbar-inner">
+                <span class="nav-title">Your status</span>
+            </div>
+        </div>
+        <div class="well" style="position: relative; top: -5px; z-index: -100" id="status-box">
+            <img class="status-gauge" src="/static/img/status-gauge-{{ user.profile.status }}.png">
+            <div class="status-meter">
+                <img src="/static/img/status-bar.png">
+            </div>
+            <div class="status">
+                <p><b>Status:</b>
+                {% autoescape off %}
+                {{ user.profile.get_fueluser.status_badge }}</p>
+                {% endautoescape %}
+                <p><b>Status value:</b></p>
+                <span class="big-numbers">{{ user.profile.status_value }}</span>
+                <p><b>Status drain / day:</b></p>
+                <span class="big-numbers">{{ user.profile.get_fueluser.status_drain }}</span>
+            </div>
+        </div>
         <div class="navbar" style="margin-bottom: 0">
             <div class="navbar-inner">
                 <span class="nav-title">Friends and you</span>

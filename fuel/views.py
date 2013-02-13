@@ -49,7 +49,7 @@ def login(request):
     elif 'email' in request.POST and 'password' in request.POST:
         email = request.POST['email']
         password = request.POST['password']
-        user = auth.authenticate(username=email, password=password)
+        user = auth.authenticate(username=email.lower(), password=password)
 
         if user is not None and user.is_active:
             auth.login(request, user)

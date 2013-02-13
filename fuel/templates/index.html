@@ -2,7 +2,7 @@
 {% block title %}index{% endblock %}
 {% block content %}
 <div class="row">
-    <div class="span6">
+    <div class="span8">
         <div class="well">
             <h2>Welcome to {{ website_name }}!</h2>
             <p>{{ website_name }} allows you to upload your own Nike+ FuelBand data and compete in an incentive program against your OIT258 classmates.</p>
@@ -21,12 +21,12 @@
             </div>
         </div>
     </div>
-    <div class="span6">
+    <div class="span4">
         <div class="well">
             <form class="form-inline" style="margin-bottom: 0" method="post" action="{% url login %}">
-                <h3>Log in to {{ website_name }}</h3>
+                <h3>Log in</h3>
                 {% csrf_token %}
-                <input class="input span2" type="text" name="email" placeholder="@stanford.edu" value="{{ email }}">
+                <input class="input input-block-level" type="text" name="email" placeholder="@stanford.edu" value="{{ email }}">
                 <input class="input span2" type="password" name="password" placeholder="password">
                 <button type="submit" class="btn btn-success" style="width: 100px; float:right">Log in</button>
             </form>

@@ -178,3 +178,54 @@ section {
 section h3 {
     padding-top: 20px;
 }
+
+div#status-box {
+    height: 270px;
+}
+
+img.status-gauge {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+}
+
+div.status-meter {
+    height: 250px;
+    width: 100px;
+    position: absolute;
+    bottom: 38px;
+    left: 16px;
+    overflow: hidden;
+}
+
+div.status-meter img {
+    position: absolute;
+    bottom: 0px;
+}
+
+div.status {
+    text-align:right;
+}
+
+div.status p {
+    margin-top: 15px;
+}
+
+span.badge-gold {
+  display: inline-block;
+  padding: 2px 4px;
+  font-size: 11.844px;
+  font-weight: bold;
+  line-height: 14px;
+  color: #ffffff;
+  vertical-align: baseline;
+  white-space: nowrap;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #ddc602;
+  padding-left: 9px;
+  padding-right: 9px;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  border-radius: 9px;
+}}
+}
