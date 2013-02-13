@@ -67,7 +67,7 @@
                 <tr>
                     <th></th>
                     <th>Date won</th>
-                    <th>User</th>
+                    <th>Winner</th>
                     <th style="text-align:right">Money won</th>
                 </tr>
             </thead>
@@ -76,7 +76,14 @@
                 <tr>
                     <td>{{ scale.id }}</td>
                     <td>{{ scale.get_end_time }}</td>
-                    <td>{{ scale.get_winner.get_full_name }}</td>
+                    <td>{% if scale.get_winner in user.profile.get_fueluser.friends %}
+                        {{ scale.get_winner.get_full_name }}
+                        {% elif scale.get_winner == user %}
+                        {{ user.get_full_name }}
+                        {% else %}
+                        Someone
+                        {% endif %}
+                    </td>
                     <td style="text-align:right">${{ scale.money|floatformat:2 }}</td>
                 </tr>
                 {% endfor %}
