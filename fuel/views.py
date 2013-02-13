@@ -217,6 +217,10 @@ def home(request):
 
     friends_output = sorted(friends_output, key=lambda f: f['cfs'], reverse=True)
     c.update({'friends': friends_output})
+
+    # total upload days
+    n = len(Amount.objects.filter(atype=2, user=request.user))
+    c.update({'upload_days': n})
     
     # write response
     response = HttpResponse(t.render(c))
