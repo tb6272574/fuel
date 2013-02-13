@@ -313,7 +313,7 @@ def stats(request):
 # requires logged in
 def game(request):
     if not request.user.is_authenticated():
-        return HttpResponseForbidden()
+        return HttpResponseRedirect(reverse('index'))
 
     t = loader.get_template('game.html')
     s_active = Scale.objects.filter(active=True)
