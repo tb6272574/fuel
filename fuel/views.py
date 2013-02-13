@@ -202,18 +202,18 @@ def home(request):
                 'money': me.winnings()
                 }
             ]
-    for f in me.friends():
-        f_fueluser = f.profile.get_fueluser()
-        cfs = sum([x.fuelscore for x in Record.objects.filter(user=f)])
-        friend = {
+    if me.friends() is not None:
+        for f in me.friends():
+            f_fueluser = f.profile.get_fueluser()
+            cfs = sum([x.fuelscore for x in Record.objects.filter(user=f)])
+            friend = {
                 'image': f_fueluser.image_url(),
                 'name': f_fueluser.get_full_name(),
                 'badge': f_fueluser.status_badge(),
                 'cfs': cfs,
                 'money': f_fueluser.winnings()
                 }
-        friends_output.append(friend)
-    s_finished = sorted(Scale.objects.filter(active=False), key=lambda scale: scale.get_end_time(), reverse=True)
+            friends_output.append(friend)
 
     friends_output = sorted(friends_output, key=lambda f: f['cfs'], reverse=True)
     c.update({'friends': friends_output})
