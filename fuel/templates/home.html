@@ -119,7 +119,7 @@
                 {{ user.profile.get_fueluser.status_badge }}</p>
                 {% endautoescape %}
                 <p><b>Status value:</b></p>
-                <span class="big-numbers">{{ user.profile.status_value }}</span>
+                <span class="big-numbers">{{ user.profile.status_value|floatformat:2 }}</span>
                 <p><b>Status drain / day:</b></p>
                 <span class="big-numbers">{{ user.profile.get_fueluser.status_drain }}</span>
             </div>
@@ -161,7 +161,7 @@
                 <div class="span4" style="text-align:center">
                     <a class="btn btn-large btn-warning btn-block" href="{% url stats %}">
                         <img src="/static/img/statistics.png" style="width: 75px"><br>
-                        >Statistics
+                        Statistics
                     </a>
                 </div>
             </div>
@@ -322,7 +322,7 @@
                             {% endif %}
                             <tr>
                                 <td><b>Status points</b></td>
-                                <td>{{ status_value }}</td>
+                                <td>{{ status_value|floatformat:2}}</td>
                             </tr>
                         </tbody>
                     </table>
