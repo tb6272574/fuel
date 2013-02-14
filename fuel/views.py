@@ -49,7 +49,7 @@ def login(request):
     elif 'email' in request.POST and 'password' in request.POST:
         email = request.POST['email']
         password = request.POST['password']
-        user = auth.authenticate(username=email, password=password)
+        user = auth.authenticate(username=email.lower(), password=password)
 
         if user is not None and user.is_active:
             auth.login(request, user)
@@ -66,6 +66,8 @@ def login(request):
                     u.backend = 'django.contrib.auth.backends.ModelBackend'
                     auth.login(request, u)
                     return HttpResponseRedirect(reverse('home'))
+                else:
+                    return render_index(request, login_fail=True)
 
     else:
         return render_index(request, login_fail=True)
@@ -139,17 +141,17 @@ def addrecord(request):
 # requires logged in
 def home(request):
     if not request.user.is_authenticated():
-        return HttpResponseForbidden()
+        return HttpResponseRedirect(reverse('index'))
 
     # calendar
     days = []
     today = datetime.date.today()
-    for i in range(3, 29):
+    for i in range(10, 29):
         d = datetime.date(2013, 2, i)
         r = Record.objects.filter(user=request.user, date=d)
         done = len(r)>0
         r = r[0] if done else None
-        future = d >= today
+        future = d >= today or i < 14
         days.append((d, done, future, r))
     for i in range(1, 17):
         d = datetime.date(2013, 3, i)
@@ -189,8 +191,41 @@ def home(request):
         c.update({HOME_STATUS_VALUE: float(request.COOKIES[HOME_STATUS_VALUE])})
         cookies_to_delete.append(HOME_STATUS_VALUE)
 
+    # friends
+    me = request.user.profile.get_fueluser()
+    friends_output = [
+            {
+                'image': me.image_url(),
+                'name': me.get_full_name(),
+                'badge': me.status_badge(),
+                'cfs': sum([x.fuelscore for x in Record.objects.filter(user=request.user)]),
+                'money': me.winnings()
+                }
+            ]
+    if me.friends() is not None:
+        for f in me.friends():
+            f_fueluser = f.profile.get_fueluser()
+            cfs = sum([x.fuelscore for x in Record.objects.filter(user=f)])
+            friend = {
+                'image': f_fueluser.image_url(),
+                'name': f_fueluser.get_full_name(),
+                'badge': f_fueluser.status_badge(),
+                'cfs': cfs,
+                'money': f_fueluser.winnings()
+                }
+            friends_output.append(friend)
+
+    friends_output = sorted(friends_output, key=lambda f: f['cfs'], reverse=True)
+    c.update({'friends': friends_output})
+
+    # total upload days
+    n = len(Amount.objects.filter(atype=2, user=request.user))
+    c.update({'upload_days': n})
+    
+    # write response
     response = HttpResponse(t.render(c))
     [response.delete_cookie(x) for x in cookies_to_delete]
+
     return response  
 
 def stats(request):
@@ -278,7 +313,7 @@ def stats(request):
 # requires logged in
 def game(request):
     if not request.user.is_authenticated():
-        return HttpResponseForbidden()
+        return HttpResponseRedirect(reverse('index'))
 
     t = loader.get_template('game.html')
     s_active = Scale.objects.filter(active=True)

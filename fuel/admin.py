@@ -27,7 +27,7 @@ admin.site.unregister(User)
 admin.site.register(FuelUser, UserProfileAdmin)
 admin.site.register(Record, RecordAdmin)
 admin.site.register(Amount, AmountAdmin)
-#admin.site.register(FriendNode)
+admin.site.register(FriendNode)
 admin.site.register(Scale, ScaleAdmin)
 
 admin.site.unregister(Group)

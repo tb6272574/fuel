@@ -188,6 +188,21 @@ class FuelUser(User):
 
         return nv-ov
 
+    def status_badge(self):
+        badge_class = {
+                'b': 'warning',
+                's': 'default',
+                'g': 'gold',
+                }
+        badge_name = {
+                'b': 'Bronze',
+                's': 'Silver',
+                'g': 'Gold'
+                }
+        return "<span class=\"badge badge-%s\">%s</span>" % (badge_class[self.get_profile().status], badge_name[self.get_profile().status])
+
+    def status_drain(self):
+        return STATUS_DEDUCTIONS_PER_DAY[self.get_profile().status]
     class Meta:
         ordering = ['id']
         proxy = True
@@ -305,18 +320,19 @@ def import_friendships(filename, count):
 def import_users(filename):
     with open(filename, 'r') as f:
         for line in f:
-            email,last,first = line.split(',')
+            email,last,first,password = line.strip().split(',')
             
-            # search user to make sure he's not instantiated alreadyi
+            # search user to make sure he's not instantiated already
             if len(User.objects.filter(email=email)) > 0:
+                print "user %s already exists, skipping" % email
                 continue
 
             u = User()
-            u.username = email
-            u.first_name = first
-            u.last_name = last
-            u.email = email
-            u.set_password(email.split('@')[0])
+            u.username = email.strip()
+            u.first_name = first.strip()
+            u.last_name = last.strip()
+            u.email = email.strip()
+            u.set_password(password.strip())
             u.save()
 
             # set up profile
@@ -330,13 +346,9 @@ def import_users(filename):
             # set up friends
             f = FriendNode.objects.filter(user=None).order_by('?')[0]
             f.user = u
-
             f.save()
 
-            
-            
-
-
+            print "user %s added" % email
 
 ### GAME MODELS ###
 

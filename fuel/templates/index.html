@@ -2,33 +2,42 @@
 {% block title %}index{% endblock %}
 {% block content %}
 <div class="row">
-    <div class="span6">
+    <div class="span8">
         <div class="well">
             <h2>Welcome to {{ website_name }}!</h2>
-            <p>{{ website_name }} allows you to upload your own Nike+ FuelBand data and compete in an incentive program against your OIT258 classmates.</p>
+            <p>Exercise, burn calories, and you raise your Fuelscore! Upload your data to earn points and gain status. Use your points to play the game, tip the scale, and win rewards!</p>
         </div>
         <div class="container-fluid" style="padding:0">
             <div class="row-fluid">
                 <div class="span4">
-                    <button class="btn btn-large btn-primary" style="width:100%; height: 75px">How it works</button>
+                    <div class="alert alert-info" style="text-align:center; padding-right:14px">
+                        <img src="/static/img/fuelscore.png" style="width: 80px; padding: 10px"><br>
+                        Wear your FuelBand each day to accumulate FuelScore.
+                    </div>
                 </div>
                 <div class="span4">
-                    <button class="btn btn-large btn-success" style="width:100%; height: 75px">Learn more</button>
+                    <div class="alert alert-success" style="text-align:center; padding-right:14px">
+                        <img src="/static/img/scale.png" style="width: 100px"><br>
+                        Convert your FuelScore to points; use points to redeem for cash rewards.
+                    </div>
                 </div>
                 <div class="span4">
-                    <button class="btn btn-large btn-info" style="width:100%; height: 75px">Join now!</button>
+                    <div class="alert alert-error" style="text-align:center; padding-right:14px">
+                        <img src="/static/img/gift.png" style="width: 100px"><br>
+                        At the end of the course, get your cash rewards as a Coupa Cafe coupon!
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="span6">
+    <div class="span4">
         <div class="well">
-            <form class="form-inline" style="margin-bottom: 0" method="post" action="{% url login %}">
-                <h3>Log in to {{ website_name }}</h3>
+            <form  style="margin-bottom: 0" method="post" action="{% url login %}">
+                <h3>Log in</h3>
                 {% csrf_token %}
-                <input class="input span2" type="text" name="email" placeholder="@stanford.edu" value="{{ email }}">
-                <input class="input span2" type="password" name="password" placeholder="password">
-                <button type="submit" class="btn btn-success" style="width: 100px; float:right">Log in</button>
+                <input class="input input-block-level" type="text" name="email" placeholder="@stanford.edu" value="{{ email }}">
+                <input class="input input-block-level" type="password" name="password" placeholder="password">
+                <button type="submit" class="btn btn-danger btn-block">Log in</button>
             </form>
             {% if login_fail %}
             <span id="auth-alert" class="alert alert-danger" style="display: block; margin-bottom: 0; margin-top: 10px">

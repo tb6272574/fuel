@@ -5,6 +5,8 @@
     month = 0;
     day = 0;
     $(document).ready(function() {
+        $("div.status-meter").height({{ user.profile.status_value }}/20);
+
         $("td.day-done").click(function() {
             $("td.day").css('font-weight', 'normal').css('background-color', '');
             $(this).css('font-weight', 'bold').css('background-color', '#ffc');
@@ -101,15 +103,43 @@
             <span><span class="big-numbers">{{ user.profile.get_fueluser.current_amount }}</span> point{{ user.profile.get_fueluser.current_amount|pluralize }}</span>
             <span class="pull-right">$<span class="big-numbers">{{ user.profile.get_fueluser.winnings|floatformat:2 }}</span></span>
         </div>
-
         <div class="navbar" style="margin-bottom: 0">
             <div class="navbar-inner">
-                <span class="nav-title">Friends</span>
+                <span class="nav-title">Your status</span>
+            </div>
+        </div>
+        <div class="well" style="position: relative; top: -5px; z-index: -100" id="status-box">
+            <img class="status-gauge" src="/static/img/status-gauge-{{ user.profile.status }}.png">
+            <div class="status-meter">
+                <img src="/static/img/status-bar.png">
+            </div>
+            <div class="status">
+                <p><b>Status:</b>
+                {% autoescape off %}
+                {{ user.profile.get_fueluser.status_badge }}</p>
+                {% endautoescape %}
+                <p><b>Status value:</b></p>
+                <span class="big-numbers">{{ user.profile.status_value|floatformat:2 }}</span>
+                <p><b>Status drain / day:</b></p>
+                <span class="big-numbers">{{ user.profile.get_fueluser.status_drain }}</span>
+            </div>
+        </div>
+        <div class="navbar" style="margin-bottom: 0">
+            <div class="navbar-inner">
+                <span class="nav-title">Friends and you</span>
             </div>
         </div>
         <div class="well" style="position: relative; top: -5px; z-index: -100">
-            {% for friend in user.profile.get_fueluser.friends %}
-            <li>{{ friend.get_full_name }}</li>
+            {% for friend in friends %}
+            <div style="height: 52px">
+                <img class="face-picture" src="/static/img/student-pictures/{{ friend.image }}" style="margin-right: 5px">
+                <b>{{ friend.name }}</b>
+                {% autoescape off %}
+                {{ friend.badge }} 
+                {% endautoescape %}
+                <br>
+                <span title="Cumulative FuelScore uploaded since 2/14/2013">FuelScore</span>: {{ friend.cfs }}, ${{ friend.money|floatformat:2 }}
+            </div>
             {% endfor %}
         </div>
     </div>
@@ -117,16 +147,25 @@
         <div class="container-fluid" style="padding:0">
             <div class="row-fluid">
                 <div class="span4" style="text-align:center">
-                    <a class="btn btn-large btn-success btn-block" href="{% url game %}">Play Game</a>
+                    <a class="btn btn-large btn-warning btn-block" href="{% url game %}">
+                        <img src="/static/img/scale-white.png" style="width: 75px"><br>
+                        Play Game
+                    </a>
                 </div>
                 <div class="span4" style="text-align:center">
-                    <a class="btn btn-large btn-success btn-block" href="{% url history %}">Point Balance</a>
+                    <a class="btn btn-large btn-warning btn-block" href="{% url history %}">
+                        <img src="/static/img/balance.png" style="width: 75px"><br>
+                        Point Balance
+                    </a>
                 </div>
                 <div class="span4" style="text-align:center">
-                    <a class="btn btn-large btn-success btn-block" href="{% url stats %}">Statistics</a>
+                    <a class="btn btn-large btn-warning btn-block" href="{% url stats %}">
+                        <img src="/static/img/statistics.png" style="width: 75px"><br>
+                        Statistics
+                    </a>
                 </div>
             </div>
-            <hr style="border-bottom: 5px dotted #c0c0c0">
+            <hr style="border-bottom: 5px dotted #e0e0e0">
             <div class="row-fluid">                             
                 <div class="span12">  
                     <h3> Input your activity </h3>
@@ -197,14 +236,15 @@
                             </div>
                             <div class="row-fluid">
                                 <div class="span12">
-                                    <button class="btn btn-block btn-primary btn-large" id="form-available-submit">Submit</button>
+                                    <button class="btn btn-block btn-danger btn-large" id="form-available-submit">Submit</button>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-            <hr style="border-bottom: 5px dotted #c0c0c0">
+                    You have uploaded data on <b>{{ upload_days }}</b> day{{ upload_days|pluralize }}.
+            <hr style="border-bottom: 5px dotted #e0e0e0">
         </div> <!-- container-fluid -->
     </div> <!-- span8 -->
 </div> <!-- row -->
@@ -282,7 +322,7 @@
                             {% endif %}
                             <tr>
                                 <td><b>Status points</b></td>
-                                <td>{{ status_value }}</td>
+                                <td>{{ status_value|floatformat:2}}</td>
                             </tr>
                         </tbody>
                     </table>

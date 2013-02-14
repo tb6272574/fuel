@@ -14,8 +14,6 @@ img.face-picture {
     width: 50px;
     height: 50px;
     border-radius: 3px;
-    box-shadow: inset 0px 0px 10px #000000;
-    -webkit-box-shadow: inset 0px 0px 10px #000000;
 }
 
 span.nav-title {
@@ -134,8 +132,18 @@ table.calendar td.day-future {
     margin-right: -6px;
     opacity: .25;
 }
+.bs-docs-sidenav > li > a {
+    color: #dd1f26;
+}
 .bs-docs-sidenav > li > a:hover {
     background-color: #f5f5f5;
+}
+
+.bs-docs-sidenav > li.active > a {
+    background-color: #dd1f26;
+}
+.bs-docs-sidenav > li.active > a:hover {
+    background-color: #dd1f26;
 }
 .bs-docs-sidenav a:hover .icon-chevron-right {
     opacity: .5;
@@ -180,3 +188,77 @@ section {
 section h3 {
     padding-top: 20px;
 }
+
+div#status-box {
+    height: 270px;
+}
+
+img.status-gauge {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+}
+
+div.status-meter {
+    height: 250px;
+    width: 100px;
+    position: absolute;
+    bottom: 38px;
+    left: 16px;
+    overflow: hidden;
+}
+
+div.status-meter img {
+    position: absolute;
+    bottom: 0px;
+}
+
+div.status {
+    text-align:right;
+}
+
+div.status p {
+    margin-top: 15px;
+}
+
+span.badge-gold {
+  display: inline-block;
+  padding: 2px 4px;
+  font-size: 11.844px;
+  font-weight: bold;
+  line-height: 14px;
+  color: #ffffff;
+  vertical-align: baseline;
+  white-space: nowrap;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #ddc602;
+  padding-left: 9px;
+  padding-right: 9px;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  border-radius: 9px;
+}
+
+.navbar-inner {
+     background-color: #d41e24;
+  background-image: -moz-linear-gradient(top, #dd1f26, #c71c22);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#dd1f26), to(#c71c22));
+  background-image: -webkit-linear-gradient(top, #dd1f26, #c71c22);
+  background-image: -o-linear-gradient(top, #dd1f26, #c71c22);
+  background-image: linear-gradient(to bottom, #dd1f26, #c71c22);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffdd1f26', endColorstr='#ffc71c22', GradientType=0);
+  border-color: #c71c22 #c71c22 #841317;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  *background-color: #c71c22;
+   
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #dd1f26;
+}
+
+.navbar-inner ul.nav > li > a:hover {
+    background-color: #a60b11;
+}
+
