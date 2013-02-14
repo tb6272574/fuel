@@ -245,9 +245,10 @@ def stats(request):
     points_avg = '['
     td = datetime.datetime.now().day
     tm = datetime.datetime.now().month
-    bound = td;
+    bound = td
     if tm == 3:
-        bound = td + 28;
+        bound = td + 28
+    print 'bound='+str(bound)
     for d in range(14,bound):
         if d <= 28:
             t=request.user.record_set.filter(date=datetime.date(2013,2,d))
@@ -264,7 +265,7 @@ def stats(request):
             calories = calories + str(t[0].calories) + ','   
             points = points + str(t[0].get_amount()) + ','  
 
-    for d in range(7,bound):
+    for d in range(14,bound):
         fs = 0
         st = 0
         cal = 0
