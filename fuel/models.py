@@ -37,7 +37,7 @@ STATUS_LIMITS = {
         'cap': 5000
         }
 
-STATUS_LOG_FILE = 'status-log'
+STATUS_LOG_FILE = '/opt/fuel/fuel/status-log'
 
 SCALE_MONEY_LIMIT = {
         'low': 2.0,
