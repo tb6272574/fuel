@@ -248,7 +248,7 @@ def stats(request):
     bound = td;
     if tm == 3:
         bound = td + 28;
-    for d in range(7,bound):  #change to (14,40)
+    for d in range(14,bound):
         if d <= 28:
             t=request.user.record_set.filter(date=datetime.date(2013,2,d))
         else:
