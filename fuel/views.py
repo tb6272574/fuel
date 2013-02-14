@@ -146,12 +146,12 @@ def home(request):
     # calendar
     days = []
     today = datetime.date.today()
-    for i in range(3, 29):
+    for i in range(10, 29):
         d = datetime.date(2013, 2, i)
         r = Record.objects.filter(user=request.user, date=d)
         done = len(r)>0
         r = r[0] if done else None
-        future = d >= today
+        future = d >= today or i < 14
         days.append((d, done, future, r))
     for i in range(1, 17):
         d = datetime.date(2013, 3, i)
