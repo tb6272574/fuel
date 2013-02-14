@@ -23,6 +23,8 @@
         if (avgdata[point] > maxdata)
             maxdata=avgdata[point];
     }
+    if (maxdata < 10/1.3)
+        maxdata = 10/1.3;
 
     var y = pv.Scale.linear(0, maxdata*1.3).range(0, h);
 
