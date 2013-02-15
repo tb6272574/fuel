@@ -127,17 +127,17 @@ class FuelUser(User):
         if nv < 0:
             nv = 0
 
-        with open(STATUS_LOG_FILE, 'a') as f:
-            f.write('[%s] %s: TICK %s, %.2f - %.2f = %.2f\n' %
-                    (
-                        datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
-                        self.email,
-                        STATUS[p.status],
-                        p.status_value,
-                        STATUS_DEDUCTIONS_PER_TICK[p.status],
-                        nv
-                        )
-                    )
+#        with open(STATUS_LOG_FILE, 'a') as f:
+#            f.write('[%s] %s: TICK %s, %.2f - %.2f = %.2f\n' %
+#                    (
+#                        datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
+#                        self.email,
+#                        STATUS[p.status],
+#                        p.status_value,
+#                        STATUS_DEDUCTIONS_PER_TICK[p.status],
+#                        nv
+#                        )
+#                    )
         p.status_value = nv
         p.save()
         self.update_status()
@@ -151,15 +151,15 @@ class FuelUser(User):
                 status = s
         
         if status != p.status:
-            with open(STATUS_LOG_FILE, 'a') as f:
-                f.write('[%s] %s: STAT %s -> %s\n' %
-                        (
-                            datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
-                            self.email,
-                            STATUS[p.status],
-                            STATUS[status],
-                            )
-                        )
+#            with open(STATUS_LOG_FILE, 'a') as f:
+#                f.write('[%s] %s: STAT %s -> %s\n' %
+#                        (
+#                            datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
+#                            self.email,
+#                            STATUS[p.status],
+#                            STATUS[status],
+#                            )
+#                        )
             p.status = status
             p.save()
         return (old_status, status)
@@ -171,16 +171,16 @@ class FuelUser(User):
         if nv > STATUS_LIMITS['cap']:
             nv = STATUS_LIMITS['cap']
 
-        with open(STATUS_LOG_FILE, 'a') as f:
-            f.write('[%s] %s: FUEL %.2f + %d = %.2f\n' %
-                    (
-                        datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
-                        self.email,
-                        ov,
-                        fuelscore,
-                        nv
-                        )
-                    )
+#        with open(STATUS_LOG_FILE, 'a') as f:
+#            f.write('[%s] %s: FUEL %.2f + %d = %.2f\n' %
+#                    (
+#                        datetime.datetime.now().strftime('%m/%d/%y %H:%M:%S'),
+#                        self.email,
+#                        ov,
+#                        fuelscore,
+#                        nv
+#                        )
+#                    )
 
         p.status_value = nv
         p.save()
