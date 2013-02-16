@@ -444,13 +444,37 @@ def dashboard(request):
 
     t = loader.get_template('dashboard.html')
     
-    users = User.objects.all()
+    fuelusers = FuelUser.objects.all()
+    profiles = Profile.objects.all()
+    records = Record.objects.all()
+    amounts = Amount.objects.all()
+    scales = Scale.objects.all()
+
+    # duplicating status badge calcs
+    badge_class = {
+            'b': 'warning',
+            's': 'default',
+            'g': 'gold',
+            }
+    badge_name = {
+            'b': 'Bronze',
+            's': 'Silver',
+            'g': 'Gold',
+            }
+
+    user_props = [{
+        'image_url': u.image_url(),
+        'status_badge': "<span class=\"badge badge-%s\">%s</span>" % (badge_class[profiles.get(id=u.id).status], badge_name[profiles.get(id=u.id).status]),
+        'full_name': u.get_full_name(),
+        'fuelscore': sum([r.fuelscore for r in records.filter(user=u)]),
+        'points': sum([a.amount for a in amounts.filter(user=u)]),
+        'winnings': sum([s.money for s in scales.filter(winner=u)]),
+        } for u in fuelusers]
     chunk_size = 6
 
     c = RequestContext(request, {
         'website_name': WEBSITE_NAME,
-        'users_paged': [users[i*chunk_size:(i+1)*chunk_size] for i in range(int(math.ceil(len(users)/float(chunk_size))))],
-        'scales': Scale.objects.all()
+        'users_paged': [user_props[i*chunk_size:(i+1)*chunk_size] for i in range(int(math.ceil(len(user_props)/float(chunk_size))))],
         })
 
     return HttpResponse(t.render(c))

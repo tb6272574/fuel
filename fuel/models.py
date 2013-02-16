@@ -360,6 +360,7 @@ class Scale(models.Model):
     money = models.FloatField('money')
     active = models.BooleanField(default=True)
     start_time = models.DateTimeField(auto_now_add=True)
+    winner = models.ForeignKey(User, blank=True, null=True)
 
     @staticmethod
     def create(money=0):
@@ -399,9 +400,8 @@ class Scale(models.Model):
         return self.amount_set.all()[0].time
 
     def get_winner(self):
-        if self.active:
-            return None
-        return self.amount_set.all()[0].user
+        return self.winner
+
     get_winner.short_description = 'Winner'
 
     def add_amount(self, amount, user):
