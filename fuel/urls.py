@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'fuel.views.logout', name='logout'),
     url(r'^stats/$', 'fuel.views.stats', name='stats'),
     url(r'^settings/$', 'fuel.views.settings', name='settings'),
+    url(r'^dashboard/$', 'fuel.views.dashboard', name='dashboard'),
 
     # actions
     url(r'^action/addrecord/', 'fuel.views.addrecord', name='addrecord'),

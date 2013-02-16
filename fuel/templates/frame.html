@@ -16,8 +16,11 @@
                     <ul class="nav pull-right">
                         {% if not user.is_anonymous %}
                         <li><a href="{% url home %}">{{ user.username }}</a></li>
-                        {% if user.is_staff %}
+                        {% if user.is_superuser %}
                         <li><a href="/admin/">Admin</a></li>
+                        {% endif %}
+                        {% if user.is_staff %}
+                        <li><a href="/dashboard/">Dashboard</a></li>
                         {% endif %}
                         <li><a href="{% url faq %}">FAQ</a></li>
                         <li><a href="{% url settings %}">Settings</a></li>

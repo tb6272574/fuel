@@ -121,6 +121,9 @@ class FuelUser(User):
     def current_amount(self):     
         return sum([a.amount for a in Amount.objects.filter(user=self)])
 
+    def total_fuelscore(self):
+        return sum([r.fuelscore for r in Record.objects.filter(user=self)])
+
     def status_tick(self):
         p = self.get_profile()
         nv = p.status_value - STATUS_DEDUCTIONS_PER_TICK[p.status]

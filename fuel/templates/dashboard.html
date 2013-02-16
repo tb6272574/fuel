@@ -1,0 +1,57 @@
+{% extends "frame.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("ul.nav-tabs a").each(function() {
+            $(this).click(function() {
+                $("ul.nav-tabs li").removeClass("active");
+                $(this).parent().addClass("active");
+                $("section.tab").hide();
+                $("section.tab"+$(this).attr('href')).show();
+                return false;
+            });
+        }).first().click();
+
+    });
+</script>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        <h1>Dashboard</h1>
+        <ul class="nav nav-tabs">
+            <li><a href="#uploads">Uploads</a></li>
+            <li><a href="#scales">Scales</a></li>
+            <li><a href="#users">Users</a></li>
+        </ul>
+    </div>
+</div>
+<!-- uploads -->
+<section id="uploads" class="tab">
+uploads
+</section>
+<!-- scales -->
+<section id="scales" class="tab">
+scales
+</section>
+<!-- users -->
+<section id="users" class="tab">
+{% for users in users_paged %}
+<div class="row">
+    {% for user in users %}
+    <div class="span2" style="position: relative">
+        <img src="/static/img/student-pictures/{{ user.profile.get_fueluser.image_url }}" style="width:100%; border-radius: 5px">
+        <div style="position: absolute; top: 5px; right: 5px">{% autoescape off %}{{ user.profile.get_fueluser.status_badge }}{% endautoescape %}</div>
+        <div class="label label-inverse" style="position: absolute; top: 120px; overflow-x: hidden">
+            {{ user.get_full_name }}
+        </div>
+        <small><b>FS</b>/{{ user.profile.get_fueluser.total_fuelscore }} <b>P</b>/{{ user.profile.get_fueluser.current_amount }} <b>$</b>{{ user.profile.get_fueluser.winnings|floatformat:2 }}</small>
+                <br>
+                <br>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+</section>
+{% endblock %}

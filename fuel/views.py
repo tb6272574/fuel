@@ -230,7 +230,7 @@ def home(request):
 
 def stats(request):
     if not request.user.is_authenticated():
-        return HttpResponseForbidden()
+        return HttpResponseRedirect(reverse('index'))
     #fuelscore = '{name:\"FuelScore\", values:['
     #steps = '{name:\"Steps\", values:[' 
     #calories = '{name:\"Calories\", values:[' 
@@ -386,6 +386,8 @@ def faq(request):
     return HttpResponse(t.render(c))
 
 def history(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('index'))
     t = loader.get_template('history.html')
     c = RequestContext(request, {'website_name': WEBSITE_NAME})
     # page the activities
@@ -397,6 +399,8 @@ def history(request):
     return HttpResponse(t.render(c))
 
 def settings(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('index'))
     t = loader.get_template('settings.html')
     c = RequestContext(request, {'website_name': WEBSITE_NAME})
     if request.method == 'GET':
@@ -431,4 +435,22 @@ def settings(request):
 
     return HttpResponse(t.render(c))
 
+def dashboard(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('index'))
 
+    if not request.user.is_staff:
+        return HttpResponseRedirect(reverse('home'))
+
+    t = loader.get_template('dashboard.html')
+    
+    users = User.objects.all()
+    chunk_size = 6
+
+    c = RequestContext(request, {
+        'website_name': WEBSITE_NAME,
+        'users_paged': [users[i*chunk_size:(i+1)*chunk_size] for i in range(int(math.ceil(len(users)/float(chunk_size))))],
+        'scales': Scale.objects.all()
+        })
+
+    return HttpResponse(t.render(c))
