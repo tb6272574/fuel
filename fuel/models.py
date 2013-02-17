@@ -95,7 +95,7 @@ class FuelUser(User):
         return sum([a.amount for a in self.amount_set.all()])  
 
     def winnings(self):
-        return sum([s.money for s in Scale.objects.filter(active=False) if s.get_winner().get_profile().get_fueluser() == self])
+        return sum([s.money for s in Scale.objects.filter(active=False, winner=self)])
 
     def friends(self):
         try:
@@ -434,6 +434,6 @@ class Scale(models.Model):
                 self.money,
                 self.current_value(),
                 self.target,
-                (', winner: %s' % self.get_winner().get_full_name()) if not self.active else ''
+                (', winner: %s' % self.get_winner().get_full_name()) if self.winner is not None else ''
                 )
 
