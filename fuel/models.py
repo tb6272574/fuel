@@ -416,6 +416,7 @@ class Scale(models.Model):
         if ta <= amount:
             a.amount = -1 * ta
             self.active = False
+            self.winner = user
             Scale.create()
         else:
             a.amount = -1 * amount
