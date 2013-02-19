@@ -463,6 +463,16 @@ def dashboard(request):
             'g': 'Gold',
             }
 
+    scale_props = [{
+        'id': s.id,
+        'current_value': -1*sum([a.amount for a in amounts.filter(scale=s)]),
+        'target_value': s.target,
+        'start_time': s.start_time,
+        'winner': s.winner.get_full_name() if s.winner is not None else '',
+        'money': s.money,
+        } for s in scales]
+    scale_props = sorted(scale_props, key=lambda scale: scale['id'], reverse=True)
+
     user_props = [{
         'image_url': u.image_url(),
         'status_badge': "<span class=\"badge badge-%s\">%s</span>" % (badge_class[profiles.get(id=u.id).status], badge_name[profiles.get(id=u.id).status]),
@@ -473,15 +483,15 @@ def dashboard(request):
         } for u in fuelusers]
 
     user_props = sorted(user_props, key=lambda user: user['fuelscore'], reverse=True)
-    chunk_size = 6
 
     c = RequestContext(request, {
         'website_name': WEBSITE_NAME,
         'users': user_props,
-        'users_paged': [user_props[i*chunk_size:(i+1)*chunk_size] for i in range(int(math.ceil(len(user_props)/float(chunk_size))))],
+        'scales': scale_props,
         'max_fuelscore': max(user_props, key=lambda user: user['fuelscore'])['fuelscore'],
         'max_points': max(user_props, key=lambda user: user['points'])['points'],
         'max_winnings': max(user_props, key=lambda user: user['winnings'])['winnings'],
+        'max_scale_money': max(scale_props, key=lambda scale: scale['money'])['money'],
         })
 
     return HttpResponse(t.render(c))

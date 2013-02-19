@@ -261,3 +261,14 @@ h1, h2, h3, h4, h5, h6 {
 .navbar-inner ul.nav > li > a:hover {
     background-color: #a60b11;
 }
+
+img.img-popup {
+    width: 20px;
+}
+img.img-popup:hover {
+    width: 100px;
+}
+
+div.progress {
+    margin-bottom: 0px;
+}
