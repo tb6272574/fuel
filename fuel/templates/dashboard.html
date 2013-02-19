@@ -21,7 +21,7 @@
     <div class="span12">
         <h1>Dashboard</h1>
         <ul class="nav nav-tabs">
-            <li><a href="#uploads">Uploads</a></li>
+            <li><a href="#uploads">Daily stats</a></li>
             <li><a href="#scales">Scales</a></li>
             <li><a href="#users">Users</a></li>
         </ul>
@@ -30,7 +30,24 @@
 <!-- uploads -->
 <section id="uploads" class="tab">
 <div class="row">
-
+    <div class="span12">
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Uploads</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for day in days %}
+                <tr>
+                    <td>{{ day.date }}</td>
+                    <td>{{ day.uploads }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 </section>
 <!-- scales -->
@@ -42,14 +59,14 @@
                 <tr>
                     <th>ID</th>
                     <th colspan=2>Money</th>
-                    <th colspan=2>Curent value</th>
+                    <th colspan=2>Current value</th>
                     <th>Winner</th>
                 </tr>
             </thead>
             <tbody>
                 {% for s in scales %}
                 <tr>
-                    <td style="width: 10%">
+                    <td style="width: 5%">
                         {{ s.id }}
                     </td>
                     <td style="width: 5%">
@@ -71,7 +88,10 @@
                         </div>
                     </td>
                     <td>
-                        <small>{{ s.winner }}</small>
+                        {% if s.winner != '' %}
+                        <img src="/static/img/student-pictures/{{ s.image_url }}" class="img-popup">
+                        {{ s.winner }}
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

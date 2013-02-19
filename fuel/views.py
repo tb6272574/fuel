@@ -463,12 +463,30 @@ def dashboard(request):
             'g': 'Gold',
             }
 
+    today = datetime.date.today()
+
+    days = []
+    if today.month == 2:
+        for x in range(14, today.day):
+            days.append(datetime.date(2013,2,x))
+    else:
+        for x in range(14, 29):
+            days.append(datetime.date(2013,2,x))
+        for x in range(1, today.day):
+            days.append(datetime.date(2013,3,x))
+    day_props = [{
+        'date': d.strftime('%m/%d/%Y'),
+        'uploads': len(records.filter(date=d)),
+        } for d in days]
+
+    day_props.reverse()
     scale_props = [{
         'id': s.id,
         'current_value': -1*sum([a.amount for a in amounts.filter(scale=s)]),
         'target_value': s.target,
         'start_time': s.start_time,
         'winner': s.winner.get_full_name() if s.winner is not None else '',
+        'image_url': fuelusers.get(id=s.winner.id).image_url() if s.winner is not None else '',
         'money': s.money,
         } for s in scales]
     scale_props = sorted(scale_props, key=lambda scale: scale['id'], reverse=True)
@@ -488,6 +506,7 @@ def dashboard(request):
         'website_name': WEBSITE_NAME,
         'users': user_props,
         'scales': scale_props,
+        'days': day_props,
         'max_fuelscore': max(user_props, key=lambda user: user['fuelscore'])['fuelscore'],
         'max_points': max(user_props, key=lambda user: user['points'])['points'],
         'max_winnings': max(user_props, key=lambda user: user['winnings'])['winnings'],
