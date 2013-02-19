@@ -450,6 +450,7 @@ def dashboard(request):
     amounts = Amount.objects.all()
     scales = Scale.objects.all()
 
+
     # duplicating status badge calcs
     badge_class = {
             'b': 'warning',
@@ -470,11 +471,17 @@ def dashboard(request):
         'points': sum([a.amount for a in amounts.filter(user=u)]),
         'winnings': sum([s.money for s in scales.filter(winner=u)]),
         } for u in fuelusers]
+
+    user_props = sorted(user_props, key=lambda user: user['fuelscore'], reverse=True)
     chunk_size = 6
 
     c = RequestContext(request, {
         'website_name': WEBSITE_NAME,
+        'users': user_props,
         'users_paged': [user_props[i*chunk_size:(i+1)*chunk_size] for i in range(int(math.ceil(len(user_props)/float(chunk_size))))],
+        'max_fuelscore': max(user_props, key=lambda user: user['fuelscore'])['fuelscore'],
+        'max_points': max(user_props, key=lambda user: user['points'])['points'],
+        'max_winnings': max(user_props, key=lambda user: user['winnings'])['winnings'],
         })
 
     return HttpResponse(t.render(c))

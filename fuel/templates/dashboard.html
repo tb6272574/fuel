@@ -11,7 +11,7 @@
                 $("section.tab"+$(this).attr('href')).show();
                 return false;
             });
-        }).first().click();
+        }).last().click();
 
     });
 </script>
@@ -29,7 +29,9 @@
 </div>
 <!-- uploads -->
 <section id="uploads" class="tab">
-uploads
+<div class="row">
+
+</div>
 </section>
 <!-- scales -->
 <section id="scales" class="tab">
@@ -37,21 +39,57 @@ scales
 </section>
 <!-- users -->
 <section id="users" class="tab">
-{% for users in users_paged %}
 <div class="row">
-    {% for u in users %}
-    <div class="span2" style="position: relative">
-        <img src="/static/img/student-pictures/{{ u.image_url }}" style="width:100%; border-radius: 5px">
-        <div style="position: absolute; top: 5px; right: 5px">{% autoescape off %}{{ u.status_badge }}{% endautoescape %}</div>
-        <div class="label label-inverse" style="position: absolute; top: 120px; overflow-x: hidden">
-            {{ u.full_name }}
-        </div>
-        <small><b>FS</b>/{{ u.fuelscore }} <b>P</b>/{{ u.points }} <b>$</b>{{ u.winnings|floatformat:2 }}</small>
-                <br>
-                <br>
+    <div class="span12">
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Status</th>
+                    <th colspan=2>FuelScore</th>
+                    <th colspan=2>Points</th>
+                    <th colspan=2>Winnings</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td style="width: 24%">
+                        <img src="/static/img/student-pictures/{{ u.image_url }}" style="width: 20px">
+                        {{ u.full_name }}</td>
+                    <td style="width: 7%">{% autoescape off %}{{ u.status_badge }}{% endautoescape %}</td>
+                    <td style="width: 3%">
+                        <small>{{ u.fuelscore }}</small>
+                    </td>
+                    <td style="width: 20%">
+                        <div class="progress progress-striped" style="margin-bottom: 0">
+                            <div class="bar" style="width:{% widthratio u.fuelscore max_fuelscore 100 %}%">
+                            </div>
+                        </div>
+                    </td>
+                    <td style="width: 3%">
+                        <small>{{ u.points }}</small>
+                    </td>
+                    <td style="width: 20%">
+                        <div class="progress progress-striped" style="margin-bottom: 0">
+                            <div class="bar bar-warning" style="width:{% widthratio u.points max_points 100 %}%">
+                            </div>
+                        </div>
+                    </td>
+                    <td style="width: 3%">
+                        <small>${{ u.winnings|floatformat:2 }}</small>
+                    </td>
+                    <td style="width: 20%">
+                        <div class="progress progress-striped" style="margin-bottom: 0">
+                            <div class="bar bar-success" style="width:{% widthratio u.winnings max_winnings 100 %}%">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    {% endfor %}
 </div>
-{% endfor %}
 </section>
 {% endblock %}
