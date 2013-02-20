@@ -498,6 +498,7 @@ def dashboard(request):
         'fuelscore': sum([r.fuelscore for r in records.filter(user=u)]),
         'points': sum([a.amount for a in amounts.filter(user=u)]),
         'winnings': sum([s.money for s in scales.filter(winner=u)]),
+        'uploads': len(records.filter(user=u)),
         } for u in fuelusers]
 
     user_props = sorted(user_props, key=lambda user: user['fuelscore'], reverse=True)
@@ -511,6 +512,7 @@ def dashboard(request):
         'max_points': max(user_props, key=lambda user: user['points'])['points'],
         'max_winnings': max(user_props, key=lambda user: user['winnings'])['winnings'],
         'max_scale_money': max(scale_props, key=lambda scale: scale['money'])['money'],
+        'num_days': len(day_props),
         })
 
     return HttpResponse(t.render(c))
