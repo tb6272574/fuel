@@ -175,7 +175,7 @@
                     <th></th>
                     <th>Status</th>
                     {% for d in days_to_now %}
-                        <th>{{ d.day }}</th>
+                    <th>{{ d.day }}</th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -188,9 +188,9 @@
                     <td style="width: 10%">{% autoescape off %}{{ u.status_badge }}{% endautoescape %}</td>
                     {% for d in days_to_now %}
                     <td>
-                     {% if d.day in u.upload_detail %}
-                      <img src="/static/img/green-tick.png" width="20">
-                     {% endif %}
+                        {% if d.day in u.upload_detail %}
+                        <i class="icon icon-ok-sign"></i>
+                        {% endif %}
                     </td>
                     {% endfor %}
                 </tr>
