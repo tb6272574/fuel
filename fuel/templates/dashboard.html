@@ -174,7 +174,7 @@
                 <tr>
                     <th></th>
                     {% for d in all_day %}
-                    <th>{{ d.day }}</th>
+                    <th style="width:3%">{{ d.day }}</th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -185,7 +185,7 @@
                         <img src="/static/img/student-pictures/{{ u.image_url }}" class="img-popup">
                         {{ u.full_name }}</td>
                     {% for d in all_day %}
-                    <td style="width:3%">
+                    <td>
                         {% if d.day in u.upload_detail %}
                         <i class="icon icon-ok-sign"></i>
                         {% endif %}
