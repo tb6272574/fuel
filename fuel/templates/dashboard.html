@@ -169,19 +169,19 @@
 <section id="uploads" class="tab">
 <div class="row">
     <div class="span12">
-        <table class="table table-condensed table-striped">
+        <table class="table table-condensed table-striped" style="table-layout:fixed">
             <thead>
                 <tr>
                     <th></th>
                     {% for d in all_day %}
-                    <th>{{ d.day }}</th>
+                    <th style="width:3%">{{ d.day }}</th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody>
                 {% for u in users %}
                 <tr>
-                    <td style="width: 20%">
+                    <td>
                         <img src="/static/img/student-pictures/{{ u.image_url }}" class="img-popup">
                         {{ u.full_name }}</td>
                     {% for d in all_day %}
