@@ -479,7 +479,14 @@ def dashboard(request):
         'uploads': len(records.filter(date=d)),
         } for d in days]
 
-    day_props.reverse()
+
+    day_props.reverse() 
+
+    all_day = []
+    for x in range(14, 29):
+        all_day.append(datetime.date(2013,2,x))
+    for x in range(1, 13):
+        all_day.append(datetime.date(2013,3,x))
     scale_props = [{
         'id': s.id,
         'current_value': -1*sum([a.amount for a in amounts.filter(scale=s)]),
@@ -506,16 +513,12 @@ def dashboard(request):
 
     user_props = sorted(user_props, key=lambda user: user['fuelscore'], reverse=True)
 
-    if len(days) <= 10:
-        days_up_to_10 = days
-    else:
-        days_up_to_10 = days[len(days)-10:len(days)]
     c = RequestContext(request, {
         'website_name': WEBSITE_NAME,
         'users': user_props,
         'scales': scale_props,
         'days': day_props,
-        'days_to_now': days_up_to_10,
+        'all_day': all_day,
         'max_fuelscore': max(user_props, key=lambda user: user['fuelscore'])['fuelscore'],
         'max_points': max(user_props, key=lambda user: user['points'])['points'],
         'max_winnings': max(user_props, key=lambda user: user['winnings'])['winnings'],
