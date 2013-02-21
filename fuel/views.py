@@ -499,15 +499,23 @@ def dashboard(request):
         'points': sum([a.amount for a in amounts.filter(user=u)]),
         'winnings': sum([s.money for s in scales.filter(winner=u)]),
         'uploads': len(records.filter(user=u)),
+        #from Feb. 14 to Mar. 12, so there's no overlap for day
+        'upload_detail': [d.date.day for d in records.filter(user=u)],
         } for u in fuelusers]
+    print days
 
     user_props = sorted(user_props, key=lambda user: user['fuelscore'], reverse=True)
 
+    if len(days) <= 10:
+        days_up_to_10 = days
+    else:
+        days_up_to_10 = days[len(days)-10:len(days)]
     c = RequestContext(request, {
         'website_name': WEBSITE_NAME,
         'users': user_props,
         'scales': scale_props,
         'days': day_props,
+        'days_to_now': days_up_to_10,
         'max_fuelscore': max(user_props, key=lambda user: user['fuelscore'])['fuelscore'],
         'max_points': max(user_props, key=lambda user: user['points'])['points'],
         'max_winnings': max(user_props, key=lambda user: user['winnings'])['winnings'],

@@ -21,14 +21,15 @@
     <div class="span12">
         <h1>Dashboard</h1>
         <ul class="nav nav-tabs">
-            <li><a href="#uploads">Daily stats</a></li>
+            <li><a href="#daily">Daily stats</a></li>
             <li><a href="#scales">Scales</a></li>
             <li><a href="#users">Users</a></li>
+            <li><a href="#uploads">Uploads</a></li>
         </ul>
     </div>
 </div>
 <!-- uploads -->
-<section id="uploads" class="tab">
+<section id="daily" class="tab">
 <div class="row">
     <div class="span12">
         <table class="table table-condensed table-striped">
@@ -158,6 +159,40 @@
                             </div>
                         </div>
                     </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</section>
+<section id="uploads" class="tab">
+<div class="row">
+    <div class="span12">
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Status</th>
+                    {% for d in days_to_now %}
+                        <th>{{ d.day }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td style="width: 20%">
+                        <img src="/static/img/student-pictures/{{ u.image_url }}" class="img-popup">
+                        {{ u.full_name }}</td>
+                    <td style="width: 10%">{% autoescape off %}{{ u.status_badge }}{% endautoescape %}</td>
+                    {% for d in days_to_now %}
+                    <td>
+                     {% if d.day in u.upload_detail %}
+                      <img src="/static/img/green-tick.png" width="20">
+                     {% endif %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 {% endfor %}
             </tbody>
