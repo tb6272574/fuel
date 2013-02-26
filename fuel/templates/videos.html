@@ -11,6 +11,7 @@ function openpopupvideos(videoURL)
     video=document.getElementById('popup_video');
     video.setAttribute("src",videoURL);
     $("#test-modal").modal('show');
+    alert($( "#sortable" ).sortable("toArray"));
 }
 
 
@@ -33,7 +34,7 @@ function openpopupvideos(videoURL)
     <div class="span12">
         <ul id="sortable">
             {% for vURL in videoURL %} 
-            <li class="ui-state-default" onclick="openpopupvideos('{{ vURL }}');">
+            <li class="ui-state-default" onclick="openpopupvideos('{{ vURL }}');" id="{{ forloop.counter }}">
                 <div class="container-fluid">
                     <div class="row-fluid">
                         <div class="span12">
