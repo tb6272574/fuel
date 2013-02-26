@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^login/$', 'fuel.views.login', name='login'),
     url(r'^logout/$', 'fuel.views.logout', name='logout'),
     url(r'^stats/$', 'fuel.views.stats', name='stats'),
+    url(r'^videos/$', 'fuel.views.videos', name='videos'),
     url(r'^settings/$', 'fuel.views.settings', name='settings'),
     url(r'^dashboard/$', 'fuel.views.dashboard', name='dashboard'),
 
