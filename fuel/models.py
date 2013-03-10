@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-import datetime, pytz
+import datetime, pytz, re, json
 from math import ceil
 from random import randint
-import re
 
 # constants
 
@@ -41,7 +40,7 @@ STATUS_LOG_FILE = '/opt/fuel/fuel/status-log'
 
 SCALE_MONEY_LIMIT = {
         'low': 2.0,
-        'high': 20.0
+        'high': 20.0,
         }
 
 TYPES = (
@@ -206,6 +205,9 @@ class FuelUser(User):
 
     def status_drain(self):
         return STATUS_DEDUCTIONS_PER_DAY[self.get_profile().status]
+
+    def project(self):
+        return self.project_set[0]
     class Meta:
         ordering = ['id']
         proxy = True
@@ -438,3 +440,29 @@ class Scale(models.Model):
                 (', winner: %s' % self.get_winner().get_full_name()) if self.winner is not None else ''
                 )
 
+
+class Project(models.Model):
+    members = models.ManyToManyField(User)
+    topic = models.CharField('topic', blank=True, max_length=200)
+    video = models.CharField(blank=True, max_length=200)
+
+    def get_members(self):
+        return ", ".join([m.get_full_name() for m in self.members.all()])
+    get_members.short_description='Members'
+
+def import_projects(filename):
+    with open(filename, 'r') as fd:
+        projects = json.load(fd)
+        print projects
+        for p in projects:
+            project = Project()
+            project.topic = p['topic']
+            print "Creating project %s" % project.topic
+            project.save()
+            for m in p['members']:
+                print " -- adding member %s" % m
+                try:
+                    project.members.add(User.objects.get(username=m))
+                except:
+                    pass
+            project.save()

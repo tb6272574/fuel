@@ -228,14 +228,12 @@ def home(request):
 
     return response  
 
-
 def videos(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(reverse('index'))
     t = loader.get_template('videos.html')
     c = RequestContext(request, {'website_name': WEBSITE_NAME})
     return HttpResponse(t.render(c))
-
      
 def stats(request):
     if not request.user.is_authenticated():
