@@ -2,19 +2,29 @@
 {% block title %}videos{% endblock %}
 {% block head %}
 <link href="/static/css/style.css" rel="stylesheet" type="text/css" />
-
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" type="text/css" />
+<script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js" type="text/javascript"></script>
 <script type="text/javascript">
+function openpopupvideos(videoURL) 
+{
+    video=document.getElementById('popup_video');
+    video.setAttribute("src",videoURL);
+    $("#test-modal").modal('show');
+    alert($( "#sortable" ).sortable("toArray"));
+}
 
-    function openpopupvideo() {
 
-        // this opens up a pop up window you can fill with your video.
-
-        // change the height, width, and video name to match your specific video
-
-        $("#test-modal").modal();
-
-    }
-
+</script>
+<style>
+    #sortable { float:right; list-style-type: none; margin: 0; padding: 5; width: 800px; }
+    #sortable li { margin: 5px 5px 5px 0; padding: 4px; float: left; width: 200px; height: 170px; font-size: 2em; text-align: center; }
+</style>
+<script>
+    $(function() {
+    $( "#sortable" ).sortable();
+    $( "#sortable" ).disableSelection();
+    });
 </script>
 {% endblock %}
 
@@ -22,21 +32,40 @@
 {% block content %}
 <div class="row">
     <div class="span12">
-        <input type="button" onclick="openpopupvideo();" value="Click here to see pop-up" />
-        <video width="420" height="340" controls>
-        <source src="/static/videos/GangnamStyle.mp4" type="video/mp4">
-        </video>
-
-        <!--<a href="/static/videos/GangnamStyle.mp4" rel="vidbox" title="caption">our video</a>
-        <a href="http://www.youtube.com/watch?v=0X3e3l5uScU" rel="vidbox" title="caption">our video</a>
-        -->
+        <ul id="sortable">
+            {% for vURL in videoURL %} 
+            <li class="ui-state-default" onclick="openpopupvideos('{{ vURL }}');" id="{{ forloop.counter }}">
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <big>Video {{ forloop.counter }}</big>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <video style="width:170px;height:170px">
+                            <source src='{{ vURL }}' type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 
-<div class="modal hide fade" id="test-modal">
-    <video width="520" height="450" controls>
-    <source src="/static/videos/GangnamStyle.mp4" type="video/mp4">
-    </video>
+<div class="modal hide fade" id="test-modal" style="width: 700px; margin: 150px 0 0 -450px;">
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span12">
+                    <video id="popup_video" controls>
+                    <source type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     </div>

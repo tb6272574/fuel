@@ -232,7 +232,7 @@ def videos(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(reverse('index'))
     t = loader.get_template('videos.html')
-    c = RequestContext(request, {'website_name': WEBSITE_NAME})
+    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'videoURL': ['/static/videos/a.mp4', '/static/videos/b.mp4', '/static/videos/a.mp4', '/static/videos/b.mp4', '/static/videos/a.mp4', '/static/videos/b.mp4','/static/videos/a.mp4', '/static/videos/b.mp4', '/static/videos/a.mp4', '/static/videos/b.mp4', '/static/videos/a.mp4', '/static/videos/b.mp4',]})
     return HttpResponse(t.render(c))
      
 def stats(request):

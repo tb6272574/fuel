@@ -1,5 +1,15 @@
 from fuel.models import *
+import time
+import datetime
 
+print 'Outputing all amounts...'
+f = open('amount.txt','w')
+for a in Amount.objects.all().reverse():
+    f.write(str(time.mktime(a.time.timetuple()))+' '+str(a.user.id)+' '+str(a.amount)+' '+str(a.atype)+'\n')
+f.close()
+
+
+print 'Outputing summary data for each user every day...'
 f = open('data.txt','w')
 
 now = 0
