@@ -231,6 +231,8 @@ def home(request):
 def videos(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(reverse('index'))
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse('index'))
     t = loader.get_template('videos.html')
     c = RequestContext(request, {
         'website_name': WEBSITE_NAME,
