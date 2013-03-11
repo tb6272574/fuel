@@ -177,11 +177,6 @@
             <span class="video-members hide">{{ p.get_members }}</span>
             <span class="video-url hide">{{ p.video }}</span>
             <span class="video-note hide">
-                {% if p.id == 8 %}
-                Note: the project group is aware that the video exceeds 90 seconds in length.
-                {% elif p.id == 12 %}
-                Note: the project group is aware that the video exceeds 90 seconds in length. However, the last 30 seconds are for entertainment purposes only and should not be considered in grading.
-                {% endif %}
             </span>
         </div>
         {% endif %}{% endfor %}
@@ -193,11 +188,6 @@
             <span class="video-members hide">{{ p.get_members }}</span>
             <span class="video-url hide">{{ p.video }}</span>
             <span class="video-note hide">
-                {% if p.id == 8 %}
-                Note: the project group is aware that the video exceeds 90 seconds in length.
-                {% elif p.id == 12 %}
-                Note: the project group is aware that the video exceeds 90 seconds in length. However, the last 30 seconds are for entertainment purposes only and should not be considered in grading.
-                {% endif %}
             </span>
         </div>{% endfor %}
         {% endif %}
