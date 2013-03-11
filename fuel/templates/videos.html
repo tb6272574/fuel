@@ -58,9 +58,12 @@
             $("#modal-title").html($("#box-" + self_id + " .video-title").html());
             $("#modal-members").html($("#box-" + self_id + " .video-members").html());
             $("#video-mp4").attr('src', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.mp4'); 
-            $("#video-webm").attr('src', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.webm'); 
+            $("#video-webm").attr('src', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.webm');
+            $("#video")[0].load();
             $("#video-modal").modal('show');
-        });
+    });
+
+    $("#video-modal").on("hide", function() {$("#video")[0].pause()});
     });
 </script>
 <style>
@@ -128,6 +131,7 @@
     </div>
     <div class="span3 offset1">
         <h3>Your video</h3>
+        {% if user.profile.get_fueluser.project != None %}
         {% with user.profile.get_fueluser.project as p %}
         <div class="video-box" id="box-{{ p.id }}">
             <div class="video source" id="video-{{ p.id }}" style="background-image:url(/static/videos/thumbnails/{{ p.video }}.png)"></div>
@@ -136,11 +140,13 @@
             <span class="video-url hide">{{ p.video }}</span>
         </div>
         {% endwith %}
+        {% endif %}
     </div>
 </div>
 <hr>
 <div class="row">
     <div class="span6">
+        {% if user.profile.get_fueluser.project != None %}
         {% for p in projects %}
         {% if p != user.profile.get_fueluser.project %}<div class="video-box" id="box-{{ p.id }}">
             <div class="video source draggable" id="video-{{ p.id }}" style="background-image:url(/static/videos/thumbnails/{{ p.video }}.png)">
@@ -150,6 +156,15 @@
             <span class="video-url hide">{{ p.video }}</span>
         </div>
         {% endif %}{% endfor %}
+        {% else %}
+        {% for p in projects %}<div class="video-box" id="box-{{ p.id }}">
+            <div class="video source draggable" id="video-{{ p.id }}" style="background-image:url(/static/videos/thumbnails/{{ p.video }}.png)">
+            </div>
+            <span class="video-title">{{ p.topic }}</span>
+            <span class="video-members hide">{{ p.get_members }}</span>
+            <span class="video-url hide">{{ p.video }}</span>
+        </div>{% endfor %}
+        {% endif %}
     </div>
     <div class="span6">
         <div class="well">
@@ -174,7 +189,7 @@
         <div class="container-fluid">
             <div class="row-fluid">
                 <div class="span8">
-                    <video id="popup_video" style="width:100%" controls>
+                    <video id="video" width=640 height=480 controls>
                     <source id="video-mp4" type="video/mp4">
                     <source id="video-webm" type="video/mp4">
                     </video>
