@@ -6,62 +6,182 @@
 <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
 <script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js" type="text/javascript"></script>
 <script type="text/javascript">
-function openpopupvideos(videoURL) 
-{
-    video=document.getElementById('popup_video');
-    video.setAttribute("src",videoURL);
-    $("#test-modal").modal('show');
-    alert($( "#sortable" ).sortable("toArray"));
-}
+    function openpopupvideos(videoURL) 
+    {
+        video=document.getElementById('popup_video');
+        video.setAttribute("src",videoURL);
+        $("#test-modal").modal('show');
+        alert($( "#sortable" ).sortable("toArray"));
+    }
 
+    function buildScoreString() {
+        scores = {};
+        hasvideo = $.map($("div.target"), function(e) {return $(e).hasClass("has-video")});
+        // can't do it if not all video scored
+        if ($.inArray(false, hasvideo) > -1)
+            return false;
 
+        // we have all scores
+
+        $.map($("div.target"), function(e) {scores[$(e).attr('id').split('-').pop()]=parseInt($(e).parent().attr('id').split('-').pop())});
+        return scores;
+        }
+
+    $(document).ready(function() {
+        $("div.video.draggable").draggable({
+            helper: "clone"
+        });
+        $("div.target").droppable({
+            accept: "div.video.draggable",
+            drop:function(event, ui) {
+                if (!$(this).hasClass('has-video')) {
+                    $(this)
+                    .css('background-image', ui.draggable.css('background-image'))
+                    .addClass('has-video')
+                    .attr('id', 'target-video-' + ui.draggable.attr('id').split('-').pop())
+                    ;
+                    ui.draggable.draggable("disable");
+                    console.log('got');
+                }
+            }
+        });
+        $("div.target").click(function() {
+            if ($(this).hasClass('has-video')) {
+                $("div#video-" + $(this).attr('id').split('-').pop()).draggable("enable");
+            $(this).css('background-image', '').removeClass('has-video').attr('id','');
+            console.log('blah');
+        }
+    });
+    $("button#remove-all").click(function() {$("div.target").click()});
+        $("div.video.source").click(function() {
+            self_id = $(this).attr('id').split('-').pop();
+            $("#modal-title").html($("#box-" + self_id + " .video-title").html());
+            $("#modal-members").html($("#box-" + self_id + " .video-members").html());
+            $("#video-mp4").attr('src', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.mp4'); 
+            $("#video-webm").attr('src', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.webm'); 
+            $("#video-modal").modal('show');
+        });
+    });
 </script>
 <style>
-    #sortable { float:right; list-style-type: none; margin: 0; padding: 5; width: 800px; }
-    #sortable li { margin: 5px 5px 5px 0; padding: 4px; float: left; width: 200px; height: 170px; font-size: 2em; text-align: center; }
+    div.video-box {
+        display: inline-block;
+        width: 200px;
+        margin-right: 20px;
+        margin-bottom: 20px;
+        vertical-align: top;
+    }
+    span.video-title {
+        font-size: 9pt;
+        width: 100%;
+        text-align: center;
+        display: inline-block;
+    }
+    div.video {
+        height: 120px;
+        width: 200px;
+        border-radius: 5px;
+        border: 1px solid #c0c0c0;
+        box-sizing: border-box;
+        vertical-align: bottom;
+        cursor: pointer;
+        background-image: url(/static/img/preview.png);
+        box-shadow: 0 0 3px rgba(0,0,0,.4);
+    }
+    div.target {
+        height: 120px;
+        width: 200px;
+        border-radius: 5px;
+        border: 1px solid #c0c0c0;
+        box-sizing: border-box;
+        margin-right: 20px;
+        margin-bottom: 20px;
+        background: #e0e0e0;
+        font-size: 20px;
+        line-height: 25px;
+        text-shadow: 0 0 3px rgba(0,0,0,.8);
+        padding-left: 3px;
+        color: white;
+        box-shadow: 0 0 3px rgba(0,0,0,.4);
+        display: inline-block;
+    }
+    div.target:last-child {
+        margin-right: 0;
+    }
 </style>
 <script>
-    $(function() {
-    $( "#sortable" ).sortable();
-    $( "#sortable" ).disableSelection();
-    });
 </script>
 {% endblock %}
 
 
 {% block content %}
 <div class="row">
-    <div class="span12">
-        <ul id="sortable">
-            {% for vURL in videoURL %} 
-            <li class="ui-state-default" onclick="openpopupvideos('{{ vURL }}');" id="{{ forloop.counter }}">
-                <div class="container-fluid">
-                    <div class="row-fluid">
-                        <div class="span12">
-                            <big>Video {{ forloop.counter }}</big>
-                        </div>
-                    </div>
-                    <div class="row-fluid">
-                        <div class="span12">
-                            <video style="width:170px;height:170px">
-                            <source src='{{ vURL }}' type="video/mp4">
-                            </video>
-                        </div>
-                    </div>
-                    </li>
+    <div class="span8">
+        <h1>Video assessment</h1>
+        <p>You will be assessing the videos produced by your classmates. You will score each video between 0 and 5, 5 being the highest quality. <em>For each score between 0 and 5, exactly two videos will have the same score.</em></p>
+        <p>Watch the 12 videos below by clicking on them. After watching, drag them to the desired score. Once you have dragged all 12 videos into their positions, click on submit to submit your scores.</p>
+        {% if user.get_score == None %}
+        <button class="btn btn-danger btn-large">Submit</button>
+        {% else %}
+        <button class="btn btn-danger btn-large" disabled>You have already submitted your scores. Thanks!</button>
+        {% endif %}
+    </div>
+    <div class="span3 offset1">
+        <h3>Your video</h3>
+        {% with user.profile.get_fueluser.project as p %}
+        <div class="video-box" id="box-{{ p.id }}">
+            <div class="video source" id="video-{{ p.id }}" style="background-image:url(/static/videos/thumbnails/{{ p.video }}.png)"></div>
+            <span class="video-title">{{ p.topic }}</span>
+            <span class="video-members hide">{{ p.get_members }}</span>
+            <span class="video-url hide">{{ p.video }}</span>
+        </div>
+        {% endwith %}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="span6">
+        {% for p in projects %}
+        {% if p != user.profile.get_fueluser.project %}<div class="video-box" id="box-{{ p.id }}">
+            <div class="video source draggable" id="video-{{ p.id }}" style="background-image:url(/static/videos/thumbnails/{{ p.video }}.png)">
+            </div>
+            <span class="video-title">{{ p.topic }}</span>
+            <span class="video-members hide">{{ p.get_members }}</span>
+            <span class="video-url hide">{{ p.video }}</span>
+        </div>
+        {% endif %}{% endfor %}
+    </div>
+    <div class="span6">
+        <div class="well">
+            Click on a video to remove it. <button class="btn btn-warning btn-small" id="remove-all">Remove all</button>
+            <hr>
+            {% for score in scores %}
+            <div id="div-score-{{ score }}">
+                <div class="target target-{{ score }}">
+                    {{ score }}
+                    </div><div class="target target-{{ score }}">
+                    {{ score }}
+                </div>
+            </div>
             {% endfor %}
-        </ul>
+        </div>
     </div>
 </div>
 
-<div class="modal hide fade" id="test-modal" style="width: 700px; margin: 150px 0 0 -450px;">
+<!-- modal -->
+<div class="modal hide fade" id="video-modal" style="width: 700px; margin: 150px 0 0 -450px;">
     <div class="modal-body">
         <div class="container-fluid">
             <div class="row-fluid">
-                <div class="span12">
-                    <video id="popup_video" controls>
-                    <source type="video/mp4">
+                <div class="span8">
+                    <video id="popup_video" style="width:100%" controls>
+                    <source id="video-mp4" type="video/mp4">
+                    <source id="video-webm" type="video/mp4">
                     </video>
+                </div>
+                <div class="span4">
+                    <h5 id="modal-title"></h5>
+                    <p id="modal-members"></p>
                 </div>
             </div>
         </div>

@@ -207,10 +207,16 @@ class FuelUser(User):
         return STATUS_DEDUCTIONS_PER_DAY[self.get_profile().status]
 
     def project(self):
-        return self.project_set[0]
+        return self.project_set.all()[0]
     class Meta:
         ordering = ['id']
         proxy = True
+
+    def get_score(self):
+        try:
+            return self.score
+        except:
+            return None
 
 class Amount(models.Model):
     user = models.ForeignKey(User)
@@ -450,6 +456,13 @@ class Project(models.Model):
         return ", ".join([m.get_full_name() for m in self.members.all()])
     get_members.short_description='Members'
 
+    def get_total(self):
+        total = sum([s.get_score(self) for s in Score.objects.all()])
+        return total
+
+    def get_average(self):
+        return self.get_total() / float(Score.objects.count())
+
 def import_projects(filename):
     with open(filename, 'r') as fd:
         projects = json.load(fd)
@@ -457,6 +470,7 @@ def import_projects(filename):
         for p in projects:
             project = Project()
             project.topic = p['topic']
+            project.video = p['video']
             print "Creating project %s" % project.topic
             project.save()
             for m in p['members']:
@@ -466,3 +480,43 @@ def import_projects(filename):
                 except:
                     pass
             project.save()
+
+class Score(models.Model):
+    user = models.OneToOneField(User)
+    score = models.CharField(blank=True, max_length=200)
+
+    # expect a dictionary of project id -> [0~5]
+    def store_scores(self, scores):
+
+        # check for constraints
+
+        # too short or too long
+        if length(scores) != Project.objects.count() - 1:
+            return 'error: invalid score length'
+
+        # each project (excluding the user's) is represented
+        for p in Project.objects.all():
+            if p != user.profile.get_fueluser().project():
+                if p.id not in scores:
+                    return 'error: %d not in score list' % p.id
+
+        # count the number of instances of each score
+        score_counts = [0, 0, 0, 0, 0, 0]
+        for s in scores:
+            score_counts[s] = score_counts[s] + 1
+
+        x = sum([s != 2 and 1 or 0 for s in score_counts])
+        if x > 0:
+            return 'error: scores don\'t follow rules'
+
+        # serialize and store score
+        self.score = json.dumps(scores)
+        self.save()
+        return 'ok'
+
+    def get_score(self, project):
+        scores = json.loads(self.score)
+        return scores[project.id]
+
+    
+    

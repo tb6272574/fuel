@@ -2,7 +2,7 @@
 from django.template import Context, loader, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.contrib import auth
-from fuel.models import FuelUser, Profile, Record, Amount, Scale
+from fuel.models import FuelUser, Profile, Record, Amount, Scale, Project
 from fuel.settings import WEBSITE_NAME
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -232,7 +232,11 @@ def videos(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(reverse('index'))
     t = loader.get_template('videos.html')
-    c = RequestContext(request, {'website_name': WEBSITE_NAME, 'videoURL': ['/static/videos/a.mp4', '/static/videos/b.mp4', '/static/videos/a.mp4', '/static/videos/b.mp4', '/static/videos/a.mp4', '/static/videos/b.mp4','/static/videos/a.mp4', '/static/videos/b.mp4', '/static/videos/a.mp4', '/static/videos/b.mp4', '/static/videos/a.mp4', '/static/videos/b.mp4',]})
+    c = RequestContext(request, {
+        'website_name': WEBSITE_NAME,
+        'projects': Project.objects.all().order_by('?'),
+        'scores': [5, 4, 3, 2, 1, 0],
+        })
     return HttpResponse(t.render(c))
      
 def stats(request):
