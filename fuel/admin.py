@@ -33,6 +33,7 @@ admin.site.register(Amount, AmountAdmin)
 admin.site.register(FriendNode)
 admin.site.register(Scale, ScaleAdmin)
 admin.site.register(Project, ProjectAdmin)
+admin.site.register(Score)
 
 admin.site.unregister(Group)
 admin.site.unregister(Site)

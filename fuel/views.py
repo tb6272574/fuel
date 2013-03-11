@@ -2,13 +2,13 @@
 from django.template import Context, loader, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.contrib import auth
-from fuel.models import FuelUser, Profile, Record, Amount, Scale, Project
+from fuel.models import FuelUser, Profile, Record, Amount, Scale, Project, Score
 from fuel.settings import WEBSITE_NAME
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
-import datetime, pytz
+import datetime, pytz, json
 import math
 
 GAME_NOT_ENOUGH_POINTS = 'not_enough_points'
@@ -231,8 +231,6 @@ def home(request):
 def videos(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(reverse('index'))
-    if not request.user.is_superuser:
-        return HttpResponseRedirect(reverse('index'))
     t = loader.get_template('videos.html')
     c = RequestContext(request, {
         'website_name': WEBSITE_NAME,
@@ -240,6 +238,19 @@ def videos(request):
         'scores': [5, 4, 3, 2, 1, 0],
         })
     return HttpResponse(t.render(c))
+
+def videos_submit(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('index'))
+    s = Score()
+    s.user = request.user
+    print request.POST['scores']
+    v = s.store_scores(json.loads(request.POST['scores']))
+    if v == 'ok':
+        return HttpResponseRedirect(reverse('videos'))
+    else:
+        return HttpResponse(v)
+
      
 def stats(request):
     if not request.user.is_authenticated():

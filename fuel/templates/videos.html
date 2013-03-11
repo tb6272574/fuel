@@ -23,16 +23,22 @@
 
         // we have all scores
 
-        $.map($("div.target"), function(e) {scores[$(e).attr('id').split('-').pop()]=parseInt($(e).parent().attr('id').split('-').pop())});
+        $.map($("div.target"), function(e) {scores[parseInt($(e).attr('id').split('-').pop())]=parseInt($(e).parent().attr('id').split('-').pop())});
         return scores;
-        }
+    }
 
     $(document).ready(function() {
+        $("#submit").click(function() {
+            scores = buildScoreString();
+            if (!scores) return false;
+            else $("#scores").val(JSON.stringify(scores));
+        });
         $("div.video.draggable").draggable({
             helper: "clone"
         });
         $("div.target").droppable({
             accept: "div.video.draggable",
+            hoverClass: "droppable-hover",
             drop:function(event, ui) {
                 if (!$(this).hasClass('has-video')) {
                     $(this)
@@ -48,22 +54,23 @@
         $("div.target").click(function() {
             if ($(this).hasClass('has-video')) {
                 $("div#video-" + $(this).attr('id').split('-').pop()).draggable("enable");
-            $(this).css('background-image', '').removeClass('has-video').attr('id','');
-            console.log('blah');
-        }
-    });
-    $("button#remove-all").click(function() {$("div.target").click()});
+                $(this).css('background-image', '').removeClass('has-video').attr('id','');
+                console.log('blah');
+            }
+        });
+        $("button#remove-all").click(function() {$("div.target").click()});
         $("div.video.source").click(function() {
             self_id = $(this).attr('id').split('-').pop();
             $("#modal-title").html($("#box-" + self_id + " .video-title").html());
             $("#modal-members").html($("#box-" + self_id + " .video-members").html());
+            $("#modal-note").html($("#box-" + self_id + " .video-note").html());
             $("#video-mp4").attr('src', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.mp4'); 
             $("#video-webm").attr('src', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.webm');
             $("#video")[0].load();
             $("#video-modal").modal('show');
-    });
+        });
 
-    $("#video-modal").on("hide", function() {$("#video")[0].pause()});
+        $("#video-modal").on("hide", function() {$("#video")[0].pause()});
     });
 </script>
 <style>
@@ -104,7 +111,7 @@
         background: #e0e0e0;
         font-size: 20px;
         line-height: 25px;
-        text-shadow: 0 0 3px rgba(0,0,0,.8);
+        text-shadow: 0 0 3px #000000;
         padding-left: 3px;
         color: white;
         box-shadow: 0 0 3px rgba(0,0,0,.4);
@@ -112,6 +119,9 @@
     }
     div.target:last-child {
         margin-right: 0;
+    }
+    .droppable-hover {
+        background: #808080 !important;
     }
 </style>
 <script>
@@ -125,8 +135,13 @@
         <h1>Video assessment</h1>
         <p>You will be assessing the videos produced by your classmates. You will score each video between 0 and 5, 5 being the highest quality. <em>For each score between 0 and 5, exactly two videos will have the same score.</em></p>
         <p>Watch the 12 videos below by clicking on them. After watching, drag them to the desired score. Once you have dragged all 12 videos into their positions, click on submit to submit your scores.</p>
-        {% if user.get_score == None %}
-        <button class="btn btn-danger btn-large">Submit</button>
+        <p><b>Careful &mdash; you can only submit once!</b></p>
+        {% if user.profile.get_fueluser.get_score == None %}
+        <form method="post" action="/videos/submit/">
+            {% csrf_token %}
+            <button class="btn btn-danger btn-large" id="submit">Submit</button>
+            <input type="hidden" name="scores" id="scores"></input>
+        </form>
         {% else %}
         <button class="btn btn-danger btn-large" disabled>You have already submitted your scores. Thanks!</button>
         {% endif %}
@@ -156,6 +171,13 @@
             <span class="video-title">{{ p.topic }}</span>
             <span class="video-members hide">{{ p.get_members }}</span>
             <span class="video-url hide">{{ p.video }}</span>
+            <span class="video-note hide">
+                {% if p.id == 8 %}
+                Note: the project group is aware that the video exceeds 90 seconds in length.
+                {% elif p.id == 12 %}
+                Note: the project group is aware that the video exceeds 90 seconds in length. However, the last 30 seconds are for entertainment purposes only and should not be considered in grading.
+                {% endif %}
+            </span>
         </div>
         {% endif %}{% endfor %}
         {% else %}
@@ -165,6 +187,13 @@
             <span class="video-title">{{ p.topic }}</span>
             <span class="video-members hide">{{ p.get_members }}</span>
             <span class="video-url hide">{{ p.video }}</span>
+            <span class="video-note hide">
+                {% if p.id == 8 %}
+                Note: the project group is aware that the video exceeds 90 seconds in length.
+                {% elif p.id == 12 %}
+                Note: the project group is aware that the video exceeds 90 seconds in length. However, the last 30 seconds are for entertainment purposes only and should not be considered in grading.
+                {% endif %}
+            </span>
         </div>{% endfor %}
         {% endif %}
     </div>
@@ -199,6 +228,7 @@
                 <div class="span4">
                     <h5 id="modal-title"></h5>
                     <p id="modal-members"></p>
+                    <p id="modal-note"></p>
                 </div>
             </div>
         </div>

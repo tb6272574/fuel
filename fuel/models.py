@@ -491,25 +491,26 @@ class Score(models.Model):
         # check for constraints
 
         # too short or too long
-        if length(scores) != Project.objects.count() - 1:
+        if len(scores) != Project.objects.count() - 1:
             return 'error: invalid score length'
 
         # each project (excluding the user's) is represented
         for p in Project.objects.all():
-            if p != user.profile.get_fueluser().project():
-                if p.id not in scores:
-                    return 'error: %d not in score list' % p.id
+            if p != self.user.profile.get_fueluser().project():
+                if str(p.id) not in scores:
+                    return 'error: %d not in score list -- %s' % (p.id, json.dumps(scores))
 
         # count the number of instances of each score
         score_counts = [0, 0, 0, 0, 0, 0]
         for s in scores:
-            score_counts[s] = score_counts[s] + 1
+            score_counts[scores[s]] = score_counts[scores[s]] + 1
 
         x = sum([s != 2 and 1 or 0 for s in score_counts])
         if x > 0:
             return 'error: scores don\'t follow rules'
 
         # serialize and store score
+
         self.score = json.dumps(scores)
         self.save()
         return 'ok'
