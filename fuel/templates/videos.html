@@ -30,7 +30,10 @@
     $(document).ready(function() {
         $("#submit").click(function() {
             scores = buildScoreString();
-            if (!scores) return false;
+            if (!scores) {
+                $(this).html('Please score all 12 videos before submitting.');
+                return false;
+        }
             else $("#scores").val(JSON.stringify(scores));
         });
         $("div.video.draggable").draggable({
@@ -64,6 +67,7 @@
             $("#modal-title").html($("#box-" + self_id + " .video-title").html());
             $("#modal-members").html($("#box-" + self_id + " .video-members").html());
             $("#modal-note").html($("#box-" + self_id + " .video-note").html());
+            $("#modal-link").attr('href', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.mp4');
             $("#video-mp4").attr('src', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.mp4'); 
             $("#video-webm").attr('src', '/static/videos/' + $("#box-" + self_id + " .video-url").html() + '.webm');
             $("#video")[0].load();
@@ -135,6 +139,7 @@
         <h1>Video assessment</h1>
         <p>You will be assessing the videos produced by your classmates. You will score each video between 0 and 5, 5 being the highest quality. <em>For each score between 0 and 5, exactly two videos will have the same score.</em></p>
         <p>Watch the 12 videos below by clicking on them. After watching, drag them to the desired score. Once you have dragged all 12 videos into their positions, click on submit to submit your scores.</p>
+        <p>Note: you may have trouble playing the videos with Internet Explorer. The videos have been tested with Chrome and Firefox on Windows, and Safari on OS X. You can also download all the videos <a href="/static/videos/videos.zip"><i class="icon icon-download-alt"></i> here</a>.
         <p><b>Careful &mdash; you can only submit once!</b></p>
         {% if user.profile.get_fueluser.get_score == None %}
         <form method="post" action="/videos/submit/">
@@ -229,6 +234,7 @@
                     <h5 id="modal-title"></h5>
                     <p id="modal-members"></p>
                     <p id="modal-note"></p>
+                    <a id="modal-link" href="#"><i class="icon icon-download-alt"></i> download video</a>
                 </div>
             </div>
         </div>
