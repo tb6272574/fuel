@@ -615,3 +615,8 @@ def survey_submit(request):
 
     return HttpResponse(message)
 
+def closed(request):
+    c = RequestContext(request)
+    t = loader.get_template('closed.html')
+
+    return HttpResponse(t.render(c))

@@ -6,6 +6,18 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
+    # close all the things!
+    url(r'^faq/$', 'fuel.views.closed'),   
+    url(r'^home/$', 'fuel.views.closed'),   
+    url(r'^history/$', 'fuel.views.closed'),   
+    url(r'^game/$', 'fuel.views.closed'),   
+    url(r'^stats/$', 'fuel.views.closed'),   
+    url(r'^videos/$', 'fuel.views.closed'),   
+    url(r'^videos/submit/$', 'fuel.views.closed'),   
+    url(r'^settings/$', 'fuel.views.closed'),   
+    url(r'^survey-submit/$', 'fuel.views.closed'),   
+    
+    # old ones
     url(r'^$', 'fuel.views.index', name='index'),
     url(r'^faq/$', 'fuel.views.faq', name='faq'),
     url(r'^home/$', 'fuel.views.home', name='home'),
