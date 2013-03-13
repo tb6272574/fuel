@@ -221,6 +221,10 @@ def home(request):
     # total upload days
     n = len(Amount.objects.filter(atype=2, user=request.user))
     c.update({'upload_days': n})
+
+    # survey completion
+    a = Amount.objects.filter(user=request.user, atype=4)
+    c.update({'survey_completed': a.count()>0})
     
     # write response
     response = HttpResponse(t.render(c))
@@ -423,7 +427,7 @@ def history(request):
     return HttpResponse(t.render(c))
 
 def settings(request):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticay2yted():
         return HttpResponseRedirect(reverse('index'))
     t = loader.get_template('settings.html')
     c = RequestContext(request, {'website_name': WEBSITE_NAME})
@@ -473,6 +477,39 @@ def dashboard(request):
     records = Record.objects.all()
     amounts = Amount.objects.all()
     scales = Scale.objects.all()
+    scores = Score.objects.all()
+    projects = Project.objects.all()
+
+    project_props = [{
+        'id': p.id,
+        'topic': p.topic
+        } for p in projects]
+
+    scores_dejsonified = {
+            s.user.id: json.loads(s.score)
+            for s in scores}
+    
+    # insert user's own project
+    for s,v in scores_dejsonified.iteritems():
+        v[str(fuelusers.get(id=s).project().id)] = -1
+    
+    print scores_dejsonified
+    scores_sorted = {
+            s: [v[k] for k in sorted(v.iterkeys(), key=lambda x: int(x))]
+            for s,v in scores_dejsonified.iteritems()}
+
+    print scores_sorted
+
+    # average
+    average = []
+    for i in range(0, len(projects)):
+        a = 0
+        c = 0
+        for s,v in scores_sorted.iteritems():
+            if v[i] != -1:
+                a = a + v[i]
+                c = c + 1
+        average.append(float(a)/float(c))
 
 
     # duplicating status badge calcs
@@ -503,7 +540,6 @@ def dashboard(request):
         'uploads': len(records.filter(date=d)),
         } for d in days]
 
-
     day_props.reverse() 
 
     all_day = []
@@ -532,6 +568,8 @@ def dashboard(request):
         'uploads': len(records.filter(user=u)),
         #from Feb. 14 to Mar. 12, so there's no overlap for day
         'upload_detail': [d.date.day for d in records.filter(user=u)],
+        'scores': scores_sorted[u.id] if u.id in scores_sorted else [],
+        'project': u.project(),
         } for u in fuelusers]
     print days
 
@@ -548,6 +586,32 @@ def dashboard(request):
         'max_winnings': max(user_props, key=lambda user: user['winnings'])['winnings'],
         'max_scale_money': max(scale_props, key=lambda scale: scale['money'])['money'],
         'num_days': len(day_props),
+        'projects': project_props,
+        'average_scores': average
         })
 
     return HttpResponse(t.render(c))
+
+def survey_submit(request):
+    if not request.user.is_authenticated():
+        return 'not authenticated'
+
+    a = Amount.objects.filter(user=request.user, atype=4)
+    if a.count() > 0:
+        message = 'You\'ve already completed the survey.'
+
+    elif request.POST['survey_code'] != 'OIT258rocks':
+        message = 'Your survey code was incorrect.'
+
+    else:
+        a = Amount()
+        a.user = request.user
+        a.amount = 200
+        a.atype = 4
+        a.time = pytz.utc.localize(datetime.datetime.utcnow())
+        a.action = 'Survey bonus'
+        a.save()
+        message = 'ok'
+
+    return HttpResponse(message)
+

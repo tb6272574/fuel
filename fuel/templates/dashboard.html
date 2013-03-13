@@ -25,6 +25,7 @@
             <li><a href="#scales">Scales</a></li>
             <li><a href="#users">Users</a></li>
             <li><a href="#uploads">Uploads</a></li>
+            <li><a href="#grading">Grading</a></li>
         </ul>
     </div>
 </div>
@@ -193,6 +194,54 @@
                     {% endfor %}
                 </tr>
                 {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</section>
+<section id="grading" class="tab">
+<div class="row">
+    <div class="span12">
+        <table class="table table-condensed table-striped" style="table-layout: fixed">
+            <thead>
+                <tr>
+                    <th></th>
+                    {% for p in projects %}
+                    <th style="width:6%; overflow-x: hidden">{{ p.topic }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <b>Average</b>
+                    </td>
+                    {% for s in average_scores %}
+                    <td>{{ s|floatformat:2 }}</td>
+                    {% endfor %}
+                </tr>
+                {% for u in users %}
+                <tr>
+                    <td>
+                        {{ u.full_name }}
+                    </td>
+                    {% if u.scores %}
+                    {% for s in u.scores %}
+                    {% if u.project.id == forloop.counter %}
+                    <td><i class="icon icon-user"></i></td>
+                    {% else %}
+                    <td>{{ s }}</td>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    {% for p in projects %}
+                    <td></td>
+                    {% endfor %}
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tbody>
             </tbody>
         </table>
     </div>

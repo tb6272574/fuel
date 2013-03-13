@@ -18,7 +18,7 @@ urlpatterns = patterns('',
     url(r'^videos/submit/$', 'fuel.views.videos_submit', name='videos_submit'),
     url(r'^settings/$', 'fuel.views.settings', name='settings'),
     url(r'^dashboard/$', 'fuel.views.dashboard', name='dashboard'),
-
+    url(r'^survey-submit/$', 'fuel.views.survey_submit', name='survey_submit'),
     # actions
     url(r'^action/addrecord/', 'fuel.views.addrecord', name='addrecord'),
     url(r'^action/addscale/(?P<scaleid>\d+)/(?P<amount>\d+)/$', 'fuel.views.addscale', name='addscale'),

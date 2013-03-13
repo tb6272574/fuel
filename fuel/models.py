@@ -48,6 +48,7 @@ TYPES = (
         (1, 'Fuel band'),
         (2, 'Daily bonus'),
         (3, 'Game'),
+        (4, 'Survey bonus'),
         )
 
 BOOST_DAYS = {
@@ -207,7 +208,8 @@ class FuelUser(User):
         return STATUS_DEDUCTIONS_PER_DAY[self.get_profile().status]
 
     def project(self):
-        return self.project_set.all()[0]
+        p = self.project_set.all()
+        return p[0] if p else None
     class Meta:
         ordering = ['id']
         proxy = True
