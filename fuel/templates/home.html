@@ -5,6 +5,18 @@
     month = 0;
     day = 0;
     $(document).ready(function() {
+
+        $("#survey-submit").click(function() {
+            $.post('/survey-submit/', {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                'survey_code': $("#survey-code").val()
+            }).done(function(e) {
+                if (e == 'ok') 
+                    location.reload();
+                else 
+                    $("#survey-message").html(e).show();
+            });
+        });
         $("div.status-meter").height({{ user.profile.status_value }}/20);
 
         $("td.day-done").click(function() {
@@ -77,7 +89,7 @@
         var yesterday = new Date();
         yesterday.setTime(yesterday.getTime() - (1000*3600*32)); //24+8 (UTC -8)    
         $("#date").val(yesterday.toJSON().substring(0,10));
-        
+
         if ($("td.day-available").length > 0) {
             $("td.day-available").last().click();
         } else if ($("td.day-done").length > 0) {
@@ -243,11 +255,30 @@
                     </form>
                 </div>
             </div>
-                    You have uploaded data on <b>{{ upload_days }}</b> day{{ upload_days|pluralize }}.
-                    <hr style="border-bottom: 5px dotted #e0e0e0">
-                    <a href="/videos/" class="btn btn-danger btn-large">Video assessment</a>
-        </div> <!-- container-fluid -->
-    </div> <!-- span8 -->
+            You have uploaded data on <b>{{ upload_days }}</b> day{{ upload_days|pluralize }}.
+            <hr style="border-bottom: 5px dotted #e0e0e0">
+            <a href="/videos/" class="btn btn-danger btn-large">Video assessment</a>
+            <hr style="border-bottom: 5px dotted #e0e0e0">
+            <div id="survey" class="well">          
+                <h3>Take the course survey, earn 200 points!</h3>
+                {% if not survey_completed %}
+                <p>Go to the following URL to take an anonymous course survey:</p>
+                <p><b>http://goo.gl/VwzVZ</b></p>
+                <p>You may wish to open the URL in a different browser (or private browsing mode) to ensure anonymity.</p>
+                <p>Once your survey is completed, you will be given a code. <em>(The code is the same for everybody; however, we ask that you do not tell this code to anyone else.)</em> Input the code below to get <b>200</b> extra points to spend in the balance game.</p>
+                {% csrf_token %}
+                <div class="input-append">
+                    <input type="text" id="survey-code" placeholder="Survey code"></input>
+                    <button class="btn btn-danger" id="survey-submit">Submit</button>
+                </div>
+                <div class="alert alert-warning hide" style="margin-top: 15px" id="survey-message"></div>
+            </form>
+            {% else %}
+            Thank you for completing your survey! 200 extra points have been added to your account.
+            {% endif %}
+        </div>
+    </div> <!-- container-fluid -->
+</div> <!-- span8 -->
 </div> <!-- row -->
 <! -- modals -->
 {% if invalid_date %}
